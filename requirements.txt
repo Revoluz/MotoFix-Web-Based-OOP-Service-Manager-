@@ -1,0 +1,30 @@
+# Django Core
+Django>=4.2,<5.0
+
+# Database
+psycopg2-binary>=2.9.5  # PostgreSQL adapter (optional, can use SQLite for development)
+
+# Environment Variables
+python-decouple>=3.8
+
+# API and Forms
+djangorestframework>=3.14.0
+django-crispy-forms>=2.0
+crispy-bootstrap5>=0.7
+
+# Utilities
+Pillow>=10.0.0  # Image processing
+python-dateutil>=2.8.2
+
+# Development Tools
+django-debug-toolbar>=4.2.0
+
+# Testing
+pytest>=7.4.0
+pytest-django>=4.5.2
+
+# Production Server (optional)
+gunicorn>=21.2.0
+
+# Security
+django-cors-headers>=4.3.0
