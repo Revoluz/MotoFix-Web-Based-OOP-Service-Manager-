@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Alokasi Mekanik - MotoFix{% endblock %}
+
+{% block content %}
+<h2>👨‍🔧 Alokasi Mekanik</h2>
+
+<div class="card">
+    <h3>Detail Servis</h3>
+    <p><strong>Motor:</strong> Honda Vario 150 - B 1234 XYZ</p>
+    <p><strong>Layanan:</strong> Servis Berkala</p>
+    <p><strong>Keluhan:</strong> Mesin terasa kasar</p>
+</div>
+
+<div class="card">
+    <h3>Pilih Mekanik</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin: 1rem 0;">
+            <label>Mekanik Tersedia:</label><br>
+            <select name="mechanic" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                <option>Budi Santoso - Tersedia</option>
+                <option>Ahmad Rizki - Tersedia</option>
+                <option>Siti Nurhaliza - Sedang Bekerja</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Alokasikan Mekanik</button>
+        <a href="{% url 'admin_hub:admin_dashboard' %}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+{% endblock %}

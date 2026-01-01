@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - MotoFix{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 3rem auto;">
+    <h2 style="text-align: center; color: #ff6b35;">📝 Registrasi Pelanggan Baru</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 1rem; margin: 1rem 0; background: {% if message.tags == 'error' %}#ffebee{% elif message.tags == 'success' %}#e8f5e9{% else %}#e3f2fd{% endif %}; border-radius: 5px; color: #333;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="POST" style="margin-top: 2rem;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username *</label>
+            <input type="text" name="username" required 
+                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email *</label>
+            <input type="email" name="email" required 
+                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">No. Telepon</label>
+            <input type="tel" name="phone" 
+                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;"
+                   placeholder="08xxxxxxxxxx">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Alamat</label>
+            <textarea name="address" rows="3" 
+                      style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;"
+                      placeholder="Masukkan alamat lengkap"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Password *</label>
+            <input type="password" name="password" required 
+                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Konfirmasi Password *</label>
+            <input type="password" name="password_confirm" required 
+                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; font-size: 1rem; margin-top: 1rem;">
+            Daftar Sekarang
+        </button>
+    </form>
+    
+    <p style="margin-top: 1.5rem; text-align: center;">
+        Sudah punya akun? <a href="{% url 'accounts:login' %}" style="color: #ff6b35; font-weight: bold;">Login di sini</a>
+    </p>
+</div>
+    <p style="margin-top: 1rem; text-align: center;">
+        Sudah punya akun? <a href="{% url 'accounts:login' %}">Login disini</a>
+    </p>
+{% endblock %}

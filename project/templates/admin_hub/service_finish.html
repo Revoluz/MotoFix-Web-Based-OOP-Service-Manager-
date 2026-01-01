@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Selesaikan Servis - MotoFix{% endblock %}
+
+{% block content %}
+<h2>✅ Selesaikan Pengerjaan</h2>
+
+<div class="card">
+    <h3>Konfirmasi Penyelesaian</h3>
+    <p><strong>Motor:</strong> Honda Vario 150 - B 1234 XYZ</p>
+    <p><strong>Layanan:</strong> Servis Berkala</p>
+    <p><strong>Mekanik:</strong> Budi Santoso</p>
+    <p><strong>Total Biaya:</strong> Rp 85.000</p>
+    
+    <form method="post" style="margin-top: 2rem;">
+        {% csrf_token %}
+        <div style="margin: 1rem 0;">
+            <label>Catatan Mekanik:</label><br>
+            <textarea name="notes" rows="4" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;"></textarea>
+        </div>
+        <button type="submit" class="btn">Tandai Selesai</button>
+        <a href="{% url 'admin_hub:admin_dashboard' %}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - MotoFix{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 4rem auto;">
+    <h2 style="text-align: center; color: #ff6b35;">🔐 Login MotoFix</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 1rem; margin: 1rem 0; background: {% if message.tags == 'error' %}#ffebee{% elif message.tags == 'success' %}#e8f5e9{% else %}#e3f2fd{% endif %}; border-radius: 5px; color: #333;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="POST" style="margin-top: 2rem;">
+        {% csrf_token %}
+        <div style="margin: 1rem 0;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username:</label>
+            <input type="text" name="username" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+        </div>
+        <div style="margin: 1rem 0;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Password:</label>
+            <input type="password" name="password" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+        </div>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem; font-size: 1rem;">Login</button>
+    </form>
+    
+    <p style="margin-top: 1rem; text-align: center;">
+        Belum punya akun? <a href="{% url 'accounts:register' %}" style="color: #ff6b35; font-weight: bold;">Daftar disini</a>
+    </p>
+    
+    <hr style="margin: 2rem 0; border: none; border-top: 1px solid #ddd;">
+    
+    <div style="background: #f9f9f9; padding: 1rem; border-radius: 5px;">
+        <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;"><strong>Demo Akun:</strong></p>
+        <p style="font-size: 0.85rem; color: #666;">• Admin: <code>admin</code> / <code>admin123</code></p>
+        <p style="font-size: 0.85rem; color: #666;">• Customer: <code>customer</code> / <code>customer123</code></p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Daftar User - Admin Hub{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>👥 Daftar User</h2>
+        <a href="{% url 'admin_hub:user_create' %}" class="btn">+ Tambah User Baru</a>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 1rem; margin-bottom: 1rem; background: {% if message.tags == 'error' %}#ffebee{% elif message.tags == 'success' %}#e8f5e9{% else %}#e3f2fd{% endif %}; border-radius: 5px; color: #333;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f5f5f5; border-bottom: 2px solid #ddd;">
+                    <th style="padding: 1rem; text-align: left;">ID</th>
+                    <th style="padding: 1rem; text-align: left;">Username</th>
+                    <th style="padding: 1rem; text-align: left;">Nama</th>
+                    <th style="padding: 1rem; text-align: left;">Email</th>
+                    <th style="padding: 1rem; text-align: left;">Role</th>
+                    <th style="padding: 1rem; text-align: left;">Telepon</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 1rem;">{{ user.id }}</td>
+                    <td style="padding: 1rem;"><strong>{{ user.username }}</strong></td>
+                    <td style="padding: 1rem;">{{ user.first_name }} {{ user.last_name }}</td>
+                    <td style="padding: 1rem;">{{ user.email|default:"-" }}</td>
+                    <td style="padding: 1rem;">
+                        <span style="padding: 0.25rem 0.75rem; background: {% if user.role == 'admin' %}#ff6b35{% elif user.role == 'mechanic' %}#4CAF50{% elif user.role == 'cashier' %}#2196F3{% else %}#9E9E9E{% endif %}; color: white; border-radius: 3px; font-size: 0.875rem;">
+                            {{ user.get_role_display }}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem;">{{ user.phone|default:"-" }}</td>
+                    <td style="padding: 1rem;">
+                        {% if user.is_active %}
+                            <span style="color: #4CAF50;">● Aktif</span>
+                        {% else %}
+                            <span style="color: #F44336;">● Nonaktif</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem; text-align: center;">
+                        <a href="{% url 'admin_hub:user_detail' user.pk %}" style="color: #2196F3; text-decoration: none; margin: 0 0.25rem;">Detail</a> |
+                        <a href="{% url 'admin_hub:user_update' user.pk %}" style="color: #FF9800; text-decoration: none; margin: 0 0.25rem;">Edit</a> |
+                        <a href="{% url 'admin_hub:user_delete' user.pk %}" style="color: #F44336; text-decoration: none; margin: 0 0.25rem;">Hapus</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="padding: 2rem; text-align: center; color: #999;">
+                        Belum ada user terdaftar
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee; color: #666;">
+        Total: <strong>{{ users|length }}</strong> user
+    </div>
+</div>
+
+<div style="margin-top: 1rem;">
+    <a href="{% url 'admin_hub:admin_dashboard' %}" class="btn btn-secondary">← Kembali ke Dashboard</a>
+</div>
+{% endblock %}

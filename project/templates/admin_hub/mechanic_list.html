@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Kelola Mekanik - MotoFix{% endblock %}
+
+{% block content %}
+<h2>👨‍🔧 Master Data Mekanik</h2>
+
+<div class="card">
+    <button class="btn">+ Tambah Mekanik Baru</button>
+</div>
+
+<div class="card">
+    <h3>Daftar Mekanik</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f4f4f4;">
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Nama</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Spesialisasi</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Status</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Budi Santoso</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Mesin</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 3px;">Tersedia</span></td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Ahmad Rizki</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Elektrikal</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 3px;">Tersedia</span></td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Siti Nurhaliza</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Umum</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #ffc107; padding: 0.25rem 0.5rem; border-radius: 3px;">Sedang Bekerja</span></td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

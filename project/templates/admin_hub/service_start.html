@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Mulai Servis - MotoFix{% endblock %}
+
+{% block content %}
+<h2>▶️ Mulai Pengerjaan Servis</h2>
+
+<div class="card">
+    <h3>Konfirmasi Mulai Servis</h3>
+    <p><strong>Motor:</strong> Honda Vario 150 - B 1234 XYZ</p>
+    <p><strong>Layanan:</strong> Servis Berkala</p>
+    <p><strong>Mekanik:</strong> Budi Santoso</p>
+    
+    <form method="post" style="margin-top: 2rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn">Mulai Pengerjaan</button>
+        <a href="{% url 'admin_hub:admin_dashboard' %}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+{% endblock %}

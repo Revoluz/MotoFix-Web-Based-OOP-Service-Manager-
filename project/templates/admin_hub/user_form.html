@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if action == 'create' %}Tambah User Baru{% else %}Edit User{% endif %} - Admin Hub{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 2rem auto;">
+    <h2>{% if action == 'create' %}➕ Tambah User Baru{% else %}✏️ Edit User{% endif %}</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 1rem; margin: 1rem 0; background: {% if message.tags == 'error' %}#ffebee{% elif message.tags == 'success' %}#e8f5e9{% else %}#e3f2fd{% endif %}; border-radius: 5px; color: #333;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="POST" style="margin-top: 2rem;">
+        {% csrf_token %}
+        
+        <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #666; font-size: 1rem;">Informasi Akun</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username *</label>
+                <input type="text" name="username" required 
+                       value="{% if user_obj %}{{ user_obj.username }}{% elif form_data %}{{ form_data.username }}{% endif %}"
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email *</label>
+                <input type="email" name="email" required 
+                       value="{% if user_obj %}{{ user_obj.email }}{% elif form_data %}{{ form_data.email }}{% endif %}"
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Password {% if action == 'create' %}*{% else %}(Kosongkan jika tidak diubah){% endif %}</label>
+                <input type="password" name="password" {% if action == 'create' %}required{% endif %}
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Konfirmasi Password {% if action == 'create' %}*{% endif %}</label>
+                <input type="password" name="password_confirm" {% if action == 'create' %}required{% endif %}
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+        </div>
+        
+        <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #666; font-size: 1rem;">Informasi Personal</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Nama Depan</label>
+                <input type="text" name="first_name" 
+                       value="{% if user_obj %}{{ user_obj.first_name }}{% elif form_data %}{{ form_data.first_name }}{% endif %}"
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Nama Belakang</label>
+                <input type="text" name="last_name" 
+                       value="{% if user_obj %}{{ user_obj.last_name }}{% elif form_data %}{{ form_data.last_name }}{% endif %}"
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Role *</label>
+            <select name="role" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">-- Pilih Role --</option>
+                <option value="customer" {% if user_obj.role == 'customer' or form_data.role == 'customer' %}selected{% endif %}>Pelanggan</option>
+                <option value="mechanic" {% if user_obj.role == 'mechanic' or form_data.role == 'mechanic' %}selected{% endif %}>Mekanik</option>
+                <option value="cashier" {% if user_obj.role == 'cashier' or form_data.role == 'cashier' %}selected{% endif %}>Kasir</option>
+                <option value="admin" {% if user_obj.role == 'admin' or form_data.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Telepon</label>
+            <input type="tel" name="phone" 
+                   value="{% if user_obj %}{{ user_obj.phone }}{% elif form_data %}{{ form_data.phone }}{% endif %}"
+                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;"
+                   placeholder="08xxxxxxxxxx">
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Alamat</label>
+            <textarea name="address" rows="3" 
+                      style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">{% if user_obj %}{{ user_obj.address }}{% elif form_data %}{{ form_data.address }}{% endif %}</textarea>
+        </div>
+        
+        {% if action == 'update' %}
+        <div style="margin-top: 1.5rem;">
+            <label style="display: flex; align-items: center; cursor: pointer;">
+                <input type="checkbox" name="is_active" {% if user_obj.is_active %}checked{% endif %} style="margin-right: 0.5rem; width: 18px; height: 18px;">
+                <span style="font-weight: bold;">Akun Aktif</span>
+            </label>
+        </div>
+        {% endif %}
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+            <button type="submit" class="btn" style="flex: 1;">
+                {% if action == 'create' %}💾 Simpan User{% else %}💾 Update User{% endif %}
+            </button>
+            <a href="{% if action == 'update' %}{% url 'admin_hub:user_detail' user_obj.pk %}{% else %}{% url 'admin_hub:user_list' %}{% endif %}" 
+               class="btn btn-secondary" style="flex: 1; text-align: center;">
+                ✖ Batal
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

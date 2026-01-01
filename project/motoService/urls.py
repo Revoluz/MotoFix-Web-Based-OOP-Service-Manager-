@@ -15,13 +15,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.http import HttpResponse
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.http import HttpResponse
+from django.shortcuts import redirect
+
 def index(request):
-    return HttpResponse("Hello, world. You're at the motoService index.")
+    """Homepage - redirect ke login"""
+    return redirect('accounts:login')
 
 urlpatterns = [
+    # Django Admin
     path('admin/', admin.site.urls),
+    
+    # # Homepage
     path('', index, name='index'),
+    
+    # Autentikasi & Akun
+    path('accounts/', include('accounts.urls')),
+    
+    # Panel Pelanggan (Customer)
+    path('customer/', include('customer.urls')),
+    
+    # Panel Admin & Manajemen (Integrated Hub)
+    path('admin-hub/', include('admin_hub.urls')),
 ]

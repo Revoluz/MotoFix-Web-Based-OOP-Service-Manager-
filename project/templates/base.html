@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MotoFix{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; background: #f4f4f4; }
+        nav { background: #333; color: #fff; padding: 1rem; }
+        nav h1 { display: inline; margin-right: 2rem; }
+        nav a { color: #fff; text-decoration: none; margin: 0 1rem; }
+        nav a:hover { color: #ff6b35; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .card { background: #fff; padding: 2rem; margin: 1rem 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-bottom: 1rem; }
+        .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #ff6b35; color: #fff; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; }
+        .btn:hover { background: #e55a2b; }
+        .btn-secondary { background: #555; }
+        .btn-secondary:hover { background: #444; }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>🏍️ MotoFix</h1>
+        {% if user.is_authenticated %}
+            {% if user.is_customer %}
+                <a href="{% url 'customer:customer_dashboard' %}">Dashboard</a>
+                <a href="{% url 'customer:motor_add' %}">Tambah Motor</a>
+                <a href="{% url 'customer:booking_create' %}">Booking Servis</a>
+                <a href="{% url 'customer:service_history' %}">Riwayat Servis</a>
+            {% else %}
+                <a href="{% url 'admin_hub:admin_dashboard' %}">Dashboard</a>
+                {% if user.is_admin_user %}
+                <a href="{% url 'admin_hub:user_list' %}">Kelola User</a>
+                {% endif %}
+                {% if user.is_mechanic or user.is_admin_user %}
+                <a href="{% url 'admin_hub:service_list' %}">Kelola Servis</a>
+                <a href="{% url 'admin_hub:mechanic_list' %}">Mekanik</a>
+                {% endif %}
+            {% endif %}
+            <a href="{% url 'accounts:logout' %}">Logout ({{ user.get_role_display }})</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}">Login</a>
+            <a href="{% url 'accounts:register' %}">Register</a>
+        {% endif %}
+    </nav>
+    
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Motor - MotoFix{% endblock %}
+
+{% block content %}
+<h2>✏️ Edit Data Motor</h2>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin: 1rem 0;">
+            <label>Merek Motor:</label><br>
+            <input type="text" name="brand" value="{{ motor.brand }}" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Model/Tipe:</label><br>
+            <input type="text" name="model" value="{{ motor.model }}" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Nomor Plat:</label><br>
+            <input type="text" name="plate_number" value="{{ motor.license_plate }}" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Tahun:</label><br>
+            <input type="number" name="year" value="{{ motor.year }}" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+        </div>
+        <button type="submit" class="btn">Update Motor</button>
+        <a href="{% url 'customer:customer_dashboard' %}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+{% endblock %}

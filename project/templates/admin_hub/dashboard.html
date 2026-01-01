@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - MotoFix{% endblock %}
+
+{% block content %}
+<h2>🎛️ Admin Dashboard</h2>
+
+<div class="card">
+    <h3>Monitoring Bengkel</h3>
+    <p>Selamat datang di panel admin MotoFix</p>
+</div>
+
+<div class="card">
+    <h3>📊 Statistik Hari Ini</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+        <div style="background: #ff6b35; color: white; padding: 1.5rem; border-radius: 5px; text-align: center;">
+            <h4>5</h4>
+            <p>Antrian Aktif</p>
+        </div>
+        <div style="background: #4caf50; color: white; padding: 1.5rem; border-radius: 5px; text-align: center;">
+            <h4>12</h4>
+            <p>Servis Selesai</p>
+        </div>
+        <div style="background: #2196f3; color: white; padding: 1.5rem; border-radius: 5px; text-align: center;">
+            <h4>3</h4>
+            <p>Mekanik Tersedia</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>🔧 Quick Actions</h3>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        {% if user.is_admin_user %}
+        <a href="{% url 'admin_hub:user_list' %}" class="btn">👥 Kelola User</a>
+        {% endif %}
+        {% if user.is_mechanic or user.is_admin_user %}
+        <a href="{% url 'admin_hub:service_list' %}" class="btn">🛠️ Kelola Layanan</a>
+        {% endif %}
+        {% if user.is_mechanic or user.is_admin_user %}
+        <a href="{% url 'admin_hub:mechanic_list' %}" class="btn btn-secondary">🔧 Kelola Mekanik</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h3>📋 Antrian Servis</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f4f4f4;">
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">No</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Motor</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Layanan</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Status</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Honda Vario 150</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Servis Berkala</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #ffc107; padding: 0.25rem 0.5rem; border-radius: 3px;">Menunggu</span></td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <a href="{% url 'admin_hub:allocate_mechanic' 1 %}" class="btn" style="padding: 0.5rem 1rem;">Alokasi</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

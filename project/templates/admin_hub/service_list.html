@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Kelola Layanan - MotoFix{% endblock %}
+
+{% block content %}
+<h2>🔧 Master Data Layanan</h2>
+
+<div class="card">
+    <a href="{% url 'admin_hub:service_add' %}" class="btn">+ Tambah Layanan Baru</a>
+</div>
+
+<div class="card">
+    <h3>Daftar Layanan</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f4f4f4;">
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Nama Layanan</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Deskripsi</th>
+                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Harga</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Servis Berkala</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Servis rutin motor</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 50.000</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Ganti Oli</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Ganti oli mesin</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 35.000</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

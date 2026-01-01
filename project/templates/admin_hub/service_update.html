@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Servis - MotoFix{% endblock %}
+
+{% block content %}
+<h2>📝 Update Detail Servis</h2>
+
+<div class="card">
+    <h3>Tambah Suku Cadang & Jasa</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin: 1rem 0;">
+            <label>Suku Cadang:</label><br>
+            <select name="part" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                <option>Oli Mesin - Rp 35.000</option>
+                <option>Busi - Rp 25.000</option>
+                <option>Filter Udara - Rp 15.000</option>
+            </select>
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Jumlah:</label><br>
+            <input type="number" name="quantity" value="1" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Jasa Tambahan:</label><br>
+            <textarea name="additional_service" rows="3" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;"></textarea>
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Biaya Jasa:</label><br>
+            <input type="number" name="service_fee" value="0" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+        </div>
+        <button type="submit" class="btn">Tambah Item</button>
+        <a href="{% url 'admin_hub:admin_dashboard' %}" class="btn btn-secondary">Selesai</a>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Item Saat Ini</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f4f4f4;">
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Item</th>
+                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Qty</th>
+                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Harga</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Jasa Servis Berkala</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">1</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 50.000</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

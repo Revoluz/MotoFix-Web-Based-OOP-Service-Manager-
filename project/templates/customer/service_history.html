@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Riwayat Servis - MotoFix{% endblock %}
+
+{% block content %}
+<h2>📜 Riwayat Servis</h2>
+
+<div class="card">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f4f4f4;">
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Tanggal</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Motor</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Layanan</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Status</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">2024-12-15</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Honda Vario 150</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Servis Berkala</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 3px;">Selesai</span></td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <a href="{% url 'customer:invoice_detail' 1 %}" class="btn" style="padding: 0.5rem 1rem;">Lihat Invoice</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

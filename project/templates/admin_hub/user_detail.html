@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Detail User - Admin Hub{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 900px; margin: 2rem auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>👤 Detail User</h2>
+        <div>
+            <a href="{% url 'admin_hub:user_update' user_obj.pk %}" class="btn" style="margin-right: 0.5rem;">✏️ Edit</a>
+            <a href="{% url 'admin_hub:user_delete' user_obj.pk %}" class="btn" style="background: #F44336;">🗑️ Hapus</a>
+        </div>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 1rem; margin-bottom: 1rem; background: {% if message.tags == 'error' %}#ffebee{% elif message.tags == 'success' %}#e8f5e9{% else %}#e3f2fd{% endif %}; border-radius: 5px; color: #333;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- Kolom Kiri -->
+        <div>
+            <h3 style="margin-bottom: 1rem; color: #666; font-size: 1rem;">Informasi Akun</h3>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">ID User</label>
+                <div style="font-size: 1.1rem; font-weight: bold;">{{ user_obj.id }}</div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Username</label>
+                <div style="font-size: 1.1rem; font-weight: bold;">{{ user_obj.username }}</div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Email</label>
+                <div style="font-size: 1.1rem;">{{ user_obj.email|default:"-" }}</div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Role</label>
+                <div>
+                    <span style="padding: 0.5rem 1rem; background: {% if user_obj.role == 'admin' %}#ff6b35{% elif user_obj.role == 'mechanic' %}#4CAF50{% elif user_obj.role == 'cashier' %}#2196F3{% else %}#9E9E9E{% endif %}; color: white; border-radius: 5px; font-size: 1rem;">
+                        {{ user_obj.get_role_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Status</label>
+                <div>
+                    {% if user_obj.is_active %}
+                        <span style="color: #4CAF50; font-size: 1.1rem;">● Aktif</span>
+                    {% else %}
+                        <span style="color: #F44336; font-size: 1.1rem;">● Nonaktif</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Kolom Kanan -->
+        <div>
+            <h3 style="margin-bottom: 1rem; color: #666; font-size: 1rem;">Informasi Personal</h3>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Nama Lengkap</label>
+                <div style="font-size: 1.1rem;">
+                    {% if user_obj.first_name or user_obj.last_name %}
+                        {{ user_obj.first_name }} {{ user_obj.last_name }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Telepon</label>
+                <div style="font-size: 1.1rem;">{{ user_obj.phone|default:"-" }}</div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Alamat</label>
+                <div style="font-size: 1rem; line-height: 1.5;">{{ user_obj.address|default:"-" }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <h3 style="margin-bottom: 1rem; color: #666; font-size: 1rem;">Informasi Sistem</h3>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Terdaftar</label>
+                <div>{{ user_obj.created_at|date:"d M Y H:i" }}</div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Terakhir Update</label>
+                <div>{{ user_obj.updated_at|date:"d M Y H:i" }}</div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Login Terakhir</label>
+                <div>{{ user_obj.last_login|date:"d M Y H:i"|default:"Belum pernah login" }}</div>
+            </div>
+        </div>
+        
+        <div>
+            <h3 style="margin-bottom: 1rem; color: #666; font-size: 1rem;">Permissions</h3>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Superuser</label>
+                <div>{% if user_obj.is_superuser %}✓ Ya{% else %}✗ Tidak{% endif %}</div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: #666; font-size: 0.875rem; margin-bottom: 0.25rem;">Staff</label>
+                <div>{% if user_obj.is_staff %}✓ Ya{% else %}✗ Tidak{% endif %}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+    <a href="{% url 'admin_hub:user_list' %}" class="btn btn-secondary">← Kembali ke Daftar User</a>
+</div>
+{% endblock %}

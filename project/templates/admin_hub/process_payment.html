@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Proses Pembayaran - MotoFix{% endblock %}
+
+{% block content %}
+<h2>💰 Proses Pembayaran</h2>
+
+<div class="card">
+    <h3>Detail Invoice</h3>
+    <p><strong>Pelanggan:</strong> John Doe</p>
+    <p><strong>Motor:</strong> Honda Vario 150 - B 1234 XYZ</p>
+    <p><strong>Layanan:</strong> Servis Berkala</p>
+</div>
+
+<div class="card">
+    <h3>Rincian Biaya</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f4f4f4;">
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Item</th>
+                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Jumlah</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Jasa Servis</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 50.000</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Oli Mesin</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 35.000</td>
+            </tr>
+            <tr style="background: #f4f4f4; font-weight: bold;">
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Total</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 85.000</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h3>Konfirmasi Pembayaran</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin: 1rem 0;">
+            <label>Metode Pembayaran:</label><br>
+            <select name="payment_method" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                <option>Cash</option>
+                <option>Transfer Bank</option>
+                <option>E-Wallet</option>
+            </select>
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Jumlah Bayar:</label><br>
+            <input type="number" name="amount_paid" value="85000" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+        </div>
+        <button type="submit" class="btn">Konfirmasi Pembayaran</button>
+        <a href="{% url 'admin_hub:admin_dashboard' %}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+{% endblock %}

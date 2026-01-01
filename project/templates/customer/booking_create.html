@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Buat Booking - MotoFix{% endblock %}
+
+{% block content %}
+<h2>📅 Buat Booking Servis</h2>
+
+<div class="card">
+    <form method="post" >
+        {% csrf_token %}
+        <div style="margin: 1rem 0;">
+            <label>Pilih Motor:</label><br>
+            <select name="motor" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                "{% comment %} Add dynamic motor options here {% endcomment %}"
+                {% for motor in motors %}
+                <option value="{{ motor.pk }}">{{ motor.brand }} {{ motor.model }} - {{ motor.license_plate }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Jenis Layanan:</label><br>
+            <select name="service" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                "{% comment %} Add dynamic service options here {% endcomment %}"
+                {% for service in service_types %}
+                <option value="{{ service.pk }}">{{ service.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Keluhan:</label><br>
+            <textarea name="complaint" rows="4" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;"></textarea>
+        </div>
+        <div style="margin: 1rem 0;">
+            <label>Tipe Booking:</label><br>
+            <select name="booking_type" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                <option value="booking">Booking (Reservasi)</option>
+                <option value="walk-in">Walk-in (Langsung)</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Buat Booking</button>
+        <a href="{% url 'customer:customer_dashboard' %}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+{% endblock %}

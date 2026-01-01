@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Hapus User - Admin Hub{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 3rem auto;">
+    <h2 style="color: #F44336; text-align: center;">🗑️ Konfirmasi Hapus User</h2>
+    
+    <div style="background: #FFF3E0; padding: 1.5rem; margin: 2rem 0; border-left: 4px solid #FF9800; border-radius: 5px;">
+        <p style="margin: 0; font-weight: bold; color: #E65100;">⚠️ Peringatan!</p>
+        <p style="margin: 0.5rem 0 0 0; color: #666;">
+            Tindakan ini tidak dapat dibatalkan. Semua data terkait user ini akan hilang.
+        </p>
+    </div>
+    
+    <div style="background: #f9f9f9; padding: 1.5rem; border-radius: 5px; margin-bottom: 2rem;">
+        <h3 style="margin-top: 0;">Detail User yang Akan Dihapus:</h3>
+        
+        <table style="width: 100%;">
+            <tr>
+                <td style="padding: 0.5rem 0; font-weight: bold; width: 150px;">Username:</td>
+                <td style="padding: 0.5rem 0;">{{ user_obj.username }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem 0; font-weight: bold;">Nama:</td>
+                <td style="padding: 0.5rem 0;">{{ user_obj.first_name }} {{ user_obj.last_name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem 0; font-weight: bold;">Email:</td>
+                <td style="padding: 0.5rem 0;">{{ user_obj.email }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem 0; font-weight: bold;">Role:</td>
+                <td style="padding: 0.5rem 0;">
+                    <span style="padding: 0.25rem 0.75rem; background: {% if user_obj.role == 'admin' %}#ff6b35{% elif user_obj.role == 'mechanic' %}#4CAF50{% elif user_obj.role == 'cashier' %}#2196F3{% else %}#9E9E9E{% endif %}; color: white; border-radius: 3px; font-size: 0.875rem;">
+                        {{ user_obj.get_role_display }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem 0; font-weight: bold;">Terdaftar:</td>
+                <td style="padding: 0.5rem 0;">{{ user_obj.created_at|date:"d M Y" }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn" style="flex: 1; background: #F44336;">
+                🗑️ Ya, Hapus User Ini
+            </button>
+            <a href="{% url 'admin_hub:user_detail' user_obj.pk %}" class="btn btn-secondary" style="flex: 1; text-align: center;">
+                ✖ Batal
+            </a>
+        </div>
+    </form>
+    
+    <p style="text-align: center; margin-top: 1.5rem; color: #999; font-size: 0.875rem;">
+        Apakah Anda yakin ingin menghapus user ini?
+    </p>
+</div>
+{% endblock %}
