@@ -19,28 +19,45 @@
         
         <div style="margin-bottom: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username *</label>
-            <input type="text" name="username" required 
-                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                 <input type="text" name="username" required 
+                     value="{{ form_data.username }}"
+                     style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+        </div>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="flex:1;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Nama Depan</label>
+                  <input type="text" name="first_name" 
+                      value="{{ form_data.first_name }}"
+                      style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+            </div>
+            <div style="flex:1;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Nama Belakang</label>
+                  <input type="text" name="last_name" 
+                      value="{{ form_data.last_name }}"
+                      style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+            </div>
         </div>
         
         <div style="margin-bottom: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email *</label>
-            <input type="email" name="email" required 
-                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                 <input type="email" name="email" required 
+                     value="{{ form_data.email }}"
+                     style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
         </div>
         
         <div style="margin-bottom: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">No. Telepon</label>
-            <input type="tel" name="phone" 
-                   style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;"
-                   placeholder="08xxxxxxxxxx">
+                 <input type="tel" name="phone" 
+                     value="{{ form_data.phone }}"
+                     style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;"
+                     placeholder="08xxxxxxxxxx">
         </div>
         
         <div style="margin-bottom: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Alamat</label>
             <textarea name="address" rows="3" 
                       style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;"
-                      placeholder="Masukkan alamat lengkap"></textarea>
+                      placeholder="Masukkan alamat lengkap">{{ form_data.address }}</textarea>
         </div>
         
         <div style="margin-bottom: 1.5rem;">

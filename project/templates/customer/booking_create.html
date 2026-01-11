@@ -8,6 +8,16 @@
 <div class="card">
     <form method="post" >
         {% csrf_token %}
+        <div style="margin: 1rem 0; display:flex; gap:1rem;">
+            <div style="flex:1;">
+                <label>Nama (opsional):</label><br>
+                <input type="text" name="first_name" value="{{ post_data.first_name|default:request.user.first_name }}" style="width:100%; padding:0.5rem;">
+            </div>
+            <div style="flex:1;">
+                <label>No. Telepon (opsional):</label><br>
+                <input type="tel" name="phone" value="{{ post_data.phone|default:request.user.phone }}" style="width:100%; padding:0.5rem;">
+            </div>
+        </div>
         <div style="margin: 1rem 0;">
             <label>Pilih Motor:</label><br>
             <select name="motor" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
@@ -33,8 +43,8 @@
         <div style="margin: 1rem 0;">
             <label>Tipe Booking:</label><br>
             <select name="booking_type" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
-                <option value="booking">Booking (Reservasi)</option>
-                <option value="walk-in">Walk-in (Langsung)</option>
+                <option value="booking" {% if booking_type == 'booking' %}selected{% endif %}>Booking (Reservasi)</option>
+                <option value="walk_in" {% if booking_type == 'walk_in' %}selected{% endif %}>Walk-in (Langsung)</option>
             </select>
         </div>
         <button type="submit" class="btn">Buat Booking</button>

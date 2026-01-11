@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Buat Booking Baru{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="font-weight: 600; color: #333;">➕ Buat Booking Baru (Walk-in)</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'admin_hub:booking_list' %}" class="btn btn-secondary" style="padding: 0.5rem 1.5rem;">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-0" style="background: #f8f9fa !important;">
+                    <h5 class="mb-0" style="font-weight: 600;">📝 Form Booking</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'admin_hub:booking_create' %}">
+                        {% csrf_token %}
+
+                        <!-- Customer Selection -->
+                        <h6 class="mb-3 mt-0" style="font-weight: 600; color: #333;">👤 Pilih Pelanggan & Motor</h6>
+                        <div class="mb-3">
+                            <label for="customerId" class="form-label" style="font-weight: 600; color: #333;">Pelanggan</label>
+                            <select class="form-select" id="customerId" name="customer_id" required style="border-radius: 4px;">
+                                <option value="">-- Pilih Pelanggan --</option>
+                                {% for customer in customers %}
+                                    <option value="{{ customer.pk }}" {% if form_data.customer_id|stringformat:"s" == customer.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ customer.get_full_name|default:customer.username }} ({{ customer.username }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="alert alert-info" style="padding: 0.75rem 1rem; border-radius: 4px;">
+                            <small><i class="fas fa-info-circle"></i> <strong>Atau</strong> isi data pelanggan baru untuk walk-in / pelanggan belum terdaftar</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="guestName" class="form-label" style="font-weight: 600; color: #333;">Nama Pelanggan (Opsional)</label>
+                            <input type="text" id="guestName" name="guest_name" class="form-control" value="{{ form_data.guest_name }}" style="border-radius: 4px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="guestPhone" class="form-label" style="font-weight: 600; color: #333;">No. Telepon Pelanggan (Opsional)</label>
+                            <input type="text" id="guestPhone" name="guest_phone" class="form-control" value="{{ form_data.guest_phone }}" style="border-radius: 4px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="motorId" class="form-label" style="font-weight: 600; color: #333;">🏍️ Motor</label>
+                            <select class="form-select" id="motorId" name="motor_id" required style="border-radius: 4px;">
+                                <option value="">-- Pilih Motor --</option>
+                                {% for motor in motors %}
+                                    <option value="{{ motor.pk }}" data-owner="{{ motor.owner.pk }}" {% if form_data.motor_id|stringformat:"s" == motor.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ motor.license_plate }} - {{ motor.brand }} {{ motor.model }} ({{ motor.owner.get_full_name|default:motor.owner.username }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <hr>
+
+                        <!-- Service Selection -->
+                        <h6 class="mb-3" style="font-weight: 600; color: #333;">🔧 Pilih Layanan</h6>
+                        <div class="mb-3">
+                            <label for="serviceTypeId" class="form-label" style="font-weight: 600; color: #333;">Jenis Layanan</label>
+                            <select class="form-select" id="serviceTypeId" name="service_type_id" required style="border-radius: 4px;">
+                                <option value="">-- Pilih Layanan --</option>
+                                {% for service_type in service_types %}
+                                    <option value="{{ service_type.pk }}" {% if form_data.service_type_id|stringformat:"s" == service_type.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ service_type.name }} - Rp {{ service_type.base_price|floatformat:0 }} 
+                                        (⏱️ {{ service_type.estimated_duration }} menit)
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <hr>
+
+                        <!-- Complaint & Notes -->
+                        <h6 class="mb-3" style="font-weight: 600; color: #333;">📝 Keluhan & Catatan</h6>
+                        <div class="mb-3">
+                            <label for="complaint" class="form-label" style="font-weight: 600; color: #333;">Keluhan / Permintaan Pelanggan</label>
+                            <textarea class="form-control" id="complaint" name="complaint" rows="4" 
+                                      placeholder="Deskripsikan keluhan atau permintaan pelanggan..." required style="border-radius: 4px;">{{ form_data.complaint }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label" style="font-weight: 600; color: #333;">Catatan Tambahan (Opsional)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                      placeholder="Catatan untuk mekanik..." style="border-radius: 4px;">{{ form_data.notes }}</textarea>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.5rem;">
+                                <i class="fas fa-save"></i> Buat Booking
+                            </button>
+                            <a href="{% url 'admin_hub:booking_list' %}" class="btn btn-secondary" style="padding: 0.5rem 1.5rem;">
+                                <i class="fas fa-times"></i> Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Sidebar -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-0" style="background: #f8f9fa !important;">
+                    <h6 class="mb-0" style="font-weight: 600;"><i class="fas fa-lightbulb"></i> Informasi</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Tipe Booking:</strong></p>
+                        <p><span class="badge bg-secondary" style="padding: 0.5rem 0.75rem;">🚶 Walk-in</span></p>
+                    </div>
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Status Awal:</strong></p>
+                        <p><span class="badge bg-warning" style="padding: 0.5rem 0.75rem;">⏳ Menunggu</span></p>
+                    </div>
+                    <hr>
+                    <p class="text-muted small mb-0">
+                        Booking baru akan dibuat dengan status "Menunggu". Admin dapat approve dan menugaskan mekanik setelah booking dibuat.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+    // Optional: filter motors by selected customer
+    document.getElementById('customerId').addEventListener('change', function(e) {
+        const customerId = e.target.value;
+        const motorSelect = document.getElementById('motorId');
+        for (let i = 0; i < motorSelect.options.length; i++) {
+            const opt = motorSelect.options[i];
+            // each motor option has data-owner attribute (set server-side below)
+            const owner = opt.getAttribute('data-owner');
+            if (!customerId) {
+                opt.style.display = '';
+            } else if (owner === customerId) {
+                opt.style.display = '';
+            } else {
+                opt.style.display = 'none';
+            }
+        }
+        motorSelect.value = '';
+    });
+    </script>
+{% endblock %}

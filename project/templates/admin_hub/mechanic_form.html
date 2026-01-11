@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if action == 'create' %}Tambah Mekanik{% else %}Edit Mekanik{% endif %} - MotoFix
+{% endblock %}
+
+{% block content %}
+<h2>
+    {% if action == 'create' %}
+        ➕ Tambah Mekanik Baru
+    {% else %}
+        ✏️ Edit Mekanik
+    {% endif %}
+</h2>
+
+<div class="card" style="max-width: 600px;">
+    <form method="post">
+        {% csrf_token %}
+
+        <div style="margin: 1rem 0;">
+            <label>Username:</label><br>
+            <input type="text" name="username" value="{{ mechanic.username|default:form_data.username }}" required style="width: 100%; padding: 0.5rem;">
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label>Email:</label><br>
+            <input type="email" name="email" value="{{ mechanic.email|default:form_data.email }}" style="width: 100%; padding: 0.5rem;">
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label>Nama Depan:</label><br>
+            <input type="text" name="first_name" value="{{ mechanic.first_name|default:form_data.first_name }}" style="width: 100%; padding: 0.5rem;">
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label>Nama Belakang:</label><br>
+            <input type="text" name="last_name" value="{{ mechanic.last_name|default:form_data.last_name }}" style="width: 100%; padding: 0.5rem;">
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label>No. Telepon:</label><br>
+            <input type="tel" name="phone" value="{{ mechanic.phone|default:form_data.phone }}" style="width: 100%; padding: 0.5rem;">
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label>Spesialisasi (e.g. Mesin, Elektrikal, Umum):</label><br>
+            <input type="text" name="specialty" value="{{ mechanic.specialty|default:form_data.specialty }}" style="width: 100%; padding: 0.5rem;">
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label>Alamat:</label><br>
+            <textarea name="address" style="width: 100%; padding: 0.5rem; min-height: 100px;">{{ mechanic.address|default:form_data.address }}</textarea>
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label>Password {% if action == 'edit' %}(Kosongkan jika tidak ingin mengubah){% else %}(Wajib){% endif %}:</label><br>
+            <input type="password" name="password" {% if action == 'create' %}required{% endif %} style="width: 100%; padding: 0.5rem;">
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label>Konfirmasi Password {% if action == 'edit' %}(Kosongkan jika tidak ingin mengubah){% else %}(Wajib){% endif %}:</label><br>
+            <input type="password" name="password_confirm" {% if action == 'create' %}required{% endif %} style="width: 100%; padding: 0.5rem;">
+        </div>
+
+        {% if action == 'edit' %}
+        <div style="margin: 1rem 0;">
+            <label>
+                <input type="checkbox" name="is_active" {% if mechanic.is_active %}checked{% endif %}>
+                Aktif
+            </label>
+        </div>
+        {% endif %}
+
+        <div style="margin: 2rem 0; display: flex; gap: 1rem;">
+            <button type="submit" class="btn" style="background: #4CAF50; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer;">
+                {% if action == 'create' %}Simpan Mekanik Baru{% else %}Simpan Perubahan{% endif %}
+            </button>
+            <a href="{% url 'admin_hub:mechanic_list' %}" class="btn" style="background: #999; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px;">Batal</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

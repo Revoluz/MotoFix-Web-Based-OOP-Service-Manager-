@@ -3,41 +3,92 @@
 {% block title %}Kelola Layanan - MotoFix{% endblock %}
 
 {% block content %}
-<h2>🔧 Master Data Layanan</h2>
+<div class="container-fluid mt-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="font-weight: 600; color: #333;">🔧 Kelola Jenis Layanan</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'admin_hub:service_add' %}" class="btn btn-success" style="padding: 0.5rem 1.5rem;">
+                <i class="fas fa-plus"></i> Tambah Layanan Baru
+            </a>
+        </div>
+    </div>
 
-<div class="card">
-    <a href="{% url 'admin_hub:service_add' %}" class="btn">+ Tambah Layanan Baru</a>
-</div>
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-<div class="card">
-    <h3>Daftar Layanan</h3>
-    <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #f4f4f4;">
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Nama Layanan</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Deskripsi</th>
-                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Harga</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Servis Berkala</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Servis rutin motor</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 50.000</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">
-                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Ganti Oli</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Ganti oli mesin</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 35.000</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">
-                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- Service List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-bottom" style="background: #f8f9fa !important;">
+            <h5 class="mb-0" style="font-weight: 600;">Daftar Jenis Layanan</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size: 0.95rem;">
+                <thead class="table-light">
+                    <tr style="background: #ff9800; border-bottom: 2px solid #dee2e6;">
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem; width: 30%;">Layanan</th>
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem; width: 40%;">Detail Harga & Waktu</th>
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem; width: 15%;">Status</th>
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem; width: 15%; text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if services %}
+                        {% for service in services %}
+                            <tr style="border-bottom: 1px solid #e9ecef; height: 75px; vertical-align: middle;">
+                                <td style="padding: 1rem 0.75rem;">
+                                    <div style="font-weight: 600; color: #333; font-size: 0.95rem; margin-bottom: 0.4rem;">{{ service.name }}</div>
+                                    <small style="color: #888; display: block; line-height: 1.3;">{{ service.description|truncatewords:10 }}</small>
+                                </td>
+                                <td style="padding: 1rem 0.75rem;">
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <span style="color: #666; font-size: 0.85rem;">💰 Harga:</span>
+                                        <strong style="color: #28a745; font-size: 0.95rem; margin-left: 0.5rem;">Rp {{ service.base_price|floatformat:0 }}</strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: #666; font-size: 0.85rem;">⏱️ Estimasi:</span>
+                                        <span style="background: #e8f5e9; color: #2e7d32; padding: 0.3rem 0.6rem; border-radius: 3px; font-size: 0.85rem; margin-left: 0.5rem; font-weight: 500;">{{ service.estimated_duration }} menit</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem 0.75rem;">
+                                    {% if service.is_active %}
+                                        <span class="badge bg-success" style="padding: 0.5rem 0.75rem; font-size: 0.85rem; font-weight: 500;">✓ Aktif</span>
+                                    {% else %}
+                                        <span class="badge bg-danger" style="padding: 0.5rem 0.75rem; font-size: 0.85rem; font-weight: 500;">✗ Nonaktif</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 1rem 0.75rem; text-align: center;">
+                                    <a href="{% url 'admin_hub:service_edit' service.pk %}" class="btn btn-sm btn-warning" style="padding: 0.45rem 0.75rem; font-size: 0.85rem; font-weight: 500;">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div style="color: #999;">
+                                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <p style="margin-top: 1rem; font-size: 1rem; color: #666;">Belum ada jenis layanan</p>
+                                    <a href="{% url 'admin_hub:service_add' %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus"></i> Tambah Sekarang
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

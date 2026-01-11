@@ -15,9 +15,23 @@ class User(AbstractUser):
         ('admin', 'Admin'),
     )
     
+    SPECIALIZATION_CHOICES = (
+        ('umum', 'Umum'),
+        ('mesin', 'Mesin'),
+        ('elektrikal', 'Elektrikal'),
+        ('ban', 'Ban'),
+        ('transmisi', 'Transmisi'),
+        ('suspensi', 'Suspensi'),
+        ('rem', 'Rem'),
+        ('karburator', 'Karburator/Injeksi'),
+        ('rantai_sproket', 'Rantai dan Sproket'),
+        ('kopling', 'Kopling'),
+    )
+    
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer')
     phone = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
+    specialization = models.CharField(max_length=50, choices=SPECIALIZATION_CHOICES, default='umum', blank=True, null=True, verbose_name='Spesialisasi')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

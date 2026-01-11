@@ -169,6 +169,7 @@ def booking_create(request):
             # Get form data
             print(request.POST)
             motor_id = request.POST.get('motor')
+            first_name = request.POST.get('first_name', '').strip()
             service_type_id = request.POST.get('service')
             complaint = request.POST.get('complaint', '').strip()
             booking_type = request.POST.get('booking_type', 'booking')
@@ -209,12 +210,17 @@ def booking_create(request):
                 })
             
             # Create booking
+            # update user's name/phone if provided
+            if first_name:
+                request.user.first_name = first_name
+                request.user.save()
+
             booking = ServiceBooking.objects.create(
                 booking_number=booking_number,
                 motor=motor,
                 customer=request.user,
                 service_type=service_type,
-                booking_type='booking',
+                booking_type=booking_type,
                 status='pending',
                 complaint=complaint,
                 booking_date=today,

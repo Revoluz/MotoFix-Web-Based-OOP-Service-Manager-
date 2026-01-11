@@ -73,6 +73,8 @@ def register(request):
     """Halaman pendaftaran pelanggan baru"""
     if request.method == 'POST':
         username = request.POST.get('username')
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
         email = request.POST.get('email')
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
@@ -96,6 +98,8 @@ def register(request):
         try:
             user = User.objects.create_user(
                 username=username,
+                first_name=first_name,
+                last_name=last_name,
                 email=email,
                 password=password,
                 role='customer',
@@ -106,5 +110,8 @@ def register(request):
             return redirect('accounts:login')
         except Exception as e:
             messages.error(request, f'Registrasi gagal: {str(e)}')
+        # On error fall through and re-render with previous form values
+        form_data = request.POST
+        return render(request, 'accounts/register.html', {'form_data': form_data})
     
     return render(request, 'accounts/register.html')

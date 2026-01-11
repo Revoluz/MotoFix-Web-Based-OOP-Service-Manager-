@@ -82,7 +82,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'motofix_db',
         'USER': 'root',
-        'PASSWORD': 'f@nan28',  # Ganti dengan password MySQL Anda
+        'PASSWORD': '',  # Ganti dengan password MySQL Anda
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {

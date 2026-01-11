@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+{% block title %}Detail Booking Service{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="font-weight: 600; color: #333;">📄 Detail Booking Service</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'admin_hub:booking_list' %}" class="btn btn-secondary" style="padding: 0.5rem 1.5rem;">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <!-- Info Booking -->
+        <div class="col-md-8">
+            <!-- Booking Header Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center border-0" style="background: #f8f9fa !important;">
+                    <h5 class="mb-0" style="font-weight: 600;">Informasi Booking</h5>
+                    <span class="badge bg-primary" style="font-size: 0.9rem; padding: 0.5rem 0.75rem;">{{ booking.booking_number }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2" style="font-weight: 600;">Status</h6>
+                            <div>
+                                {% if booking.status == 'pending' %}
+                                    <span class="badge bg-warning" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">⏳ {{ booking.get_status_display }}</span>
+                                {% elif booking.status == 'assigned' %}
+                                    <span class="badge bg-info" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">✓ {{ booking.get_status_display }}</span>
+                                {% elif booking.status == 'in_progress' %}
+                                    <span class="badge bg-secondary" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">🔧 {{ booking.get_status_display }}</span>
+                                {% elif booking.status == 'finished' %}
+                                    <span class="badge bg-success" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">✅ {{ booking.get_status_display }}</span>
+                                {% elif booking.status == 'paid' %}
+                                    <span class="badge bg-primary" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">💳 {{ booking.get_status_display }}</span>
+                                {% elif booking.status == 'cancelled' %}
+                                    <span class="badge bg-danger" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">✗ {{ booking.get_status_display }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2" style="font-weight: 600;">Tipe Booking</h6>
+                            <p>
+                                {% if booking.booking_type == 'booking' %}
+                                    <span class="badge bg-info" style="padding: 0.5rem 0.75rem;">📅 Booking Online</span>
+                                {% else %}
+                                    <span class="badge bg-secondary" style="padding: 0.5rem 0.75rem;">🚶 Walk-in</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Customer Info -->
+                    <h6 class="mb-3" style="font-weight: 600;"><i class="fas fa-user"></i> Informasi Pelanggan</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Nama:</strong>
+                                {% if booking.customer %}
+                                    {% if booking.customer.get_full_name %}
+                                        {{ booking.customer.get_full_name }}
+                                    {% elif booking.customer.first_name or booking.customer.last_name %}
+                                        {{ booking.customer.first_name }} {{ booking.customer.last_name }}
+                                    {% else %}
+                                        {{ booking.customer.username }}
+                                    {% endif %}
+                                {% else %}
+                                    <em class="text-muted">(Pelanggan tidak tersedia)</em>
+                                {% endif %}
+                            </p>
+                            <p class="mb-2"><strong>Username:</strong> <small>{% if booking.customer %}{{ booking.customer.username }}{% else %}-{% endif %}</small></p>
+                            <p class="mb-0"><strong>Email:</strong> <small>{% if booking.customer and booking.customer.email %}{{ booking.customer.email }}{% else %}-{% endif %}</small></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Telepon:</strong> <small>{% if booking.customer and booking.customer.phone %}{{ booking.customer.phone }}{% else %}-{% endif %}</small></p>
+                            <p class="mb-0"><strong>Alamat:</strong> <small>{% if booking.customer and booking.customer.address %}{{ booking.customer.address }}{% else %}-{% endif %}</small></p>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Motor Info -->
+                    <h6 class="mb-3" style="font-weight: 600;"><i class="fas fa-motorcycle"></i> Informasi Motor</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Plat Nomor:</strong> <span style="color: #007bff; font-weight: 600;">{{ booking.motor.license_plate }}</span></p>
+                            <p class="mb-0"><strong>Brand:</strong> {{ booking.motor.brand }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Model:</strong> {{ booking.motor.model }}</p>
+                            <p class="mb-0"><strong>Tahun:</strong> {{ booking.motor.year }}</p>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Service Info -->
+                    <h6 class="mb-3" style="font-weight: 600;"><i class="fas fa-wrench"></i> Informasi Layanan</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Jenis Layanan:</strong> {{ booking.service_type.name }}</p>
+                            <p class="mb-0"><strong>Harga Dasar:</strong> <span style="color: #28a745; font-weight: 600;">Rp {{ booking.service_type.base_price|floatformat:0 }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-0"><strong>Estimasi Durasi:</strong> <span class="badge bg-light text-dark" style="padding: 0.35rem 0.65rem;">⏱️ {{ booking.service_type.estimated_duration }} menit</span></p>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Complaint & Notes -->
+                    <h6 class="mb-3" style="font-weight: 600;"><i class="fas fa-sticky-note"></i> Keluhan & Catatan</h6>
+                    <div class="mb-3">
+                        <p class="mb-2"><strong>Keluhan:</strong></p>
+                        <div class="bg-light p-3 rounded" style="border-left: 3px solid #007bff;">{{ booking.complaint }}</div>
+                    </div>
+                    {% if booking.notes %}
+                        <div class="mb-4">
+                            <p class="mb-2"><strong>Catatan Tambahan:</strong></p>
+                            <div class="bg-light p-3 rounded" style="border-left: 3px solid #ffc107;">{{ booking.notes }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+                    {% if csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm w-100 mb-2">
+                                <i class="fas fa-check"></i> Approve Booking
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {% if booking.status == 'pending' or booking.status == 'assigned' %}
+                        <form method="post" action="{% url 'admin_hub:booking_cancel' booking.pk %}" class="mb-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm w-100 mb-2" onclick="return confirm('Yakin ingin membatalkan booking ini?')">
+                                <i class="fas fa-times"></i> Batalkan Booking
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {% if booking.status == 'pending' or booking.status == 'assigned' and not booking.mechanic %}
+                        <button type="button" class="btn btn-info btn-sm w-100 mb-2" data-bs-toggle="modal" data-bs-target="#mechanicModal">
+                            <i class="fas fa-user"></i> Tugaskan Mekanik
+                        </button>
+                    {% endif %}
+
+                    {% if booking.status == 'assigned' %}
+                        <form method="post" action="{% url 'admin_hub:booking_start' booking.pk %}" class="mb-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning btn-sm w-100 mb-2">
+                                <i class="fas fa-play"></i> Mulai Pengerjaan
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {% if booking.status == 'in_progress' %}
+                        <form method="post" action="{% url 'admin_hub:booking_finish' booking.pk %}" class="mb-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm w-100 mb-2">
+                                <i class="fas fa-check-circle"></i> Selesaikan Pengerjaan
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {% if booking.status == 'finished' %}
+                        <form method="post" action="{% url 'admin_hub:booking_update_status' booking.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="paid">
+                            <button type="submit" class="btn btn-primary btn-sm w-100 mb-2">
+                                <i class="fas fa-money-bill"></i> Tandai Sudah Dibayar
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Mekanik Info -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="fas fa-user-tie"></i> Mekanik Ditugaskan</h6>
+                </div>
+                <div class="card-body">
+                    {% if booking.mechanic %}
+                        <div class="text-center">
+                            <div class="mb-2">
+                                <i class="fas fa-user-circle" style="font-size: 3rem; color: #6c757d;"></i>
+                            </div>
+                            <h6>{{ booking.mechanic.get_full_name }}</h6>
+                            <p class="text-muted mb-1">{{ booking.mechanic.username }}</p>
+                            <p class="text-muted mb-0">{{ booking.mechanic.phone }}</p>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center mb-0">Belum ada mekanik yang ditugaskan</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Assign Mechanic -->
+<div class="modal fade" id="mechanicModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tugaskan Mekanik</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'admin_hub:booking_assign_mechanic' booking.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="mechanicSelect" class="form-label">Pilih Mekanik</label>
+                        <select class="form-select" id="mechanicSelect" name="mechanic_id" required>
+                            <option value="">-- Pilih Mekanik --</option>
+                            {% for mechanic in mechanics %}
+                                <option value="{{ mechanic.pk }}">
+                                    {{ mechanic.get_full_name }} ({{ mechanic.username }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Tugaskan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        margin-top: 20px;
+    }
+    .timeline-item {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    .timeline-marker {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 15px;
+        flex-shrink: 0;
+        margin-top: 5px;
+    }
+    .timeline-content {
+        flex: 1;
+    }
+</style>
+{% endblock %}

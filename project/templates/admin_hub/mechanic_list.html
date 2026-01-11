@@ -3,49 +3,84 @@
 {% block title %}Kelola Mekanik - MotoFix{% endblock %}
 
 {% block content %}
-<h2>👨‍🔧 Master Data Mekanik</h2>
+<div class="container-fluid mt-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 style="font-weight: 600; color: #333;">👨‍🔧 Master Data Mekanik</h2>
+        </div>
+    </div>
 
-<div class="card">
-    <button class="btn">+ Tambah Mekanik Baru</button>
-</div>
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-<div class="card">
-    <h3>Daftar Mekanik</h3>
-    <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #f4f4f4;">
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Nama</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Spesialisasi</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Status</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Budi Santoso</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Mesin</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 3px;">Tersedia</span></td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">
-                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Ahmad Rizki</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Elektrikal</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 3px;">Tersedia</span></td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">
-                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Siti Nurhaliza</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Umum</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #ffc107; padding: 0.25rem 0.5rem; border-radius: 3px;">Sedang Bekerja</span></td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">
-                    <a href="#" class="btn" style="padding: 0.5rem 1rem;">Edit</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- Mechanic List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-bottom" style="background: #f8f9fa !important;">
+            <h5 class="mb-0" style="font-weight: 600;">Daftar Mekanik</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size: 0.95rem;">
+                <thead class="table-light">
+                    <tr style="background: #ff9800; border-bottom: 2px solid #dee2e6;">
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem;">Nama</th>
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem;">Spesialisasi</th>
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem;">No. Telepon</th>
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem;">Status</th>
+                        <th style="font-weight: 600; color: white; padding: 1rem 0.75rem; font-size: 0.9rem; text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if mechanics %}
+                        {% for mechanic in mechanics %}
+                            <tr style="border-bottom: 1px solid #e9ecef; height: 70px; vertical-align: middle;">
+                                <td style="padding: 0.75rem; font-weight: 500; color: #333;">
+                                    {{ mechanic.get_full_name }}
+                                </td>
+                                <td style="padding: 0.75rem;">
+                                    {% if mechanic.specialization %}
+                                        <span class="badge bg-light text-dark" style="padding: 0.4rem 0.7rem; font-size: 0.85rem; font-weight: 500;">⚙️ {{ mechanic.specialization }}</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark" style="padding: 0.4rem 0.7rem; font-size: 0.85rem; font-weight: 500;">⚙️ Umum</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 0.75rem;">
+                                    <small style="color: #666; font-size: 0.9rem;">{{ mechanic.phone_number|default:"N/A" }}</small>
+                                </td>
+                                <td style="padding: 0.75rem;">
+                                    <span class="badge bg-success" style="padding: 0.4rem 0.7rem; font-size: 0.85rem; font-weight: 500;">✓ Aktif</span>
+                                </td>
+                                <td style="padding: 0.75rem; text-align: center;">
+                                    <a href="#" class="btn btn-sm btn-warning" style="padding: 0.4rem 0.7rem; font-size: 0.85rem; font-weight: 500;">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-danger" style="padding: 0.4rem 0.7rem; font-size: 0.85rem; font-weight: 500;">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div style="color: #999;">
+                                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                    <p style="margin-top: 1rem; font-size: 1rem; color: #666;">Belum ada mekanik ditemukan</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}
+

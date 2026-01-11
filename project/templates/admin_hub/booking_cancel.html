@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Batalkan Booking{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Batalkan Booking</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Peringatan!</strong> Anda akan membatalkan booking berikut:
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="mb-1"><strong>Nomor Booking:</strong> <span class="badge bg-primary">{{ booking.booking_number }}</span></p>
+                        <p class="mb-1"><strong>Pelanggan:</strong> {{ booking.customer.get_full_name }}</p>
+                        <p class="mb-1"><strong>Motor:</strong> {{ booking.motor.license_plate }} - {{ booking.motor.brand }} {{ booking.motor.model }}</p>
+                        <p class="mb-1"><strong>Jenis Layanan:</strong> {{ booking.service_type.name }}</p>
+                        <p class="mb-0"><strong>Status Saat Ini:</strong> <span class="badge bg-{{ booking.status|status_badge_class }}">{{ booking.get_status_display }}</span></p>
+                    </div>
+
+                    <form method="post" action="{% url 'admin_hub:booking_cancel' booking.pk %}">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Ya, Batalkan Booking
+                            </button>
+                            <a href="{% url 'admin_hub:booking_detail' booking.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -79,6 +79,23 @@
         </div>
         
         <div style="margin-top: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Spesialisasi <span style="color: #999; font-weight: normal;">(Untuk Mekanik)</span></label>
+            <select name="specialization" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">-- Pilih Spesialisasi --</option>
+                <option value="umum" {% if user_obj.specialization == 'umum' or form_data.specialization == 'umum' %}selected{% endif %}>Umum</option>
+                <option value="mesin" {% if user_obj.specialization == 'mesin' or form_data.specialization == 'mesin' %}selected{% endif %}>Mesin</option>
+                <option value="elektrikal" {% if user_obj.specialization == 'elektrikal' or form_data.specialization == 'elektrikal' %}selected{% endif %}>Elektrikal</option>
+                <option value="ban" {% if user_obj.specialization == 'ban' or form_data.specialization == 'ban' %}selected{% endif %}>Ban</option>
+                <option value="transmisi" {% if user_obj.specialization == 'transmisi' or form_data.specialization == 'transmisi' %}selected{% endif %}>Transmisi</option>
+                <option value="suspensi" {% if user_obj.specialization == 'suspensi' or form_data.specialization == 'suspensi' %}selected{% endif %}>Suspensi</option>
+                <option value="rem" {% if user_obj.specialization == 'rem' or form_data.specialization == 'rem' %}selected{% endif %}>Rem</option>
+                <option value="karburator" {% if user_obj.specialization == 'karburator' or form_data.specialization == 'karburator' %}selected{% endif %}>Karburator/Injeksi</option>
+                <option value="rantai_sproket" {% if user_obj.specialization == 'rantai_sproket' or form_data.specialization == 'rantai_sproket' %}selected{% endif %}>Rantai dan Sproket</option>
+                <option value="kopling" {% if user_obj.specialization == 'kopling' or form_data.specialization == 'kopling' %}selected{% endif %}>Kopling</option>
+            </select>
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Telepon</label>
             <input type="tel" name="phone" 
                    value="{% if user_obj %}{{ user_obj.phone }}{% elif form_data %}{{ form_data.phone }}{% endif %}"

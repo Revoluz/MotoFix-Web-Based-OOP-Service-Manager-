@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Hapus Mekanik - MotoFix{% endblock %}
+
+{% block content %}
+<h2>⚠️ Hapus Mekanik</h2>
+
+<div class="card" style="max-width: 600px;">
+    <div style="padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; margin-bottom: 1rem;">
+        <strong>Perhatian!</strong> Anda akan menghapus data mekanik:<br>
+        <strong>{{ mechanic.get_full_name|default:mechanic.username }}</strong>
+    </div>
+
+    <p>Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin?</p>
+
+    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="background: #f44336; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer;">
+                Ya, Hapus Mekanik
+            </button>
+        </form>
+        <a href="{% url 'admin_hub:mechanic_list' %}" class="btn" style="background: #999; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 4px;">Batal</a>
+    </div>
+</div>
+{% endblock %}
