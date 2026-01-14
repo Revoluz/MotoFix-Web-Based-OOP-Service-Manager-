@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Buat Booking Baru{% endblock %}
+{% block title %}Buat Booking Baru - MotoFix{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4">
@@ -10,12 +10,13 @@
             <h2 style="font-weight: 600; color: #333;">➕ Buat Booking Baru (Walk-in)</h2>
         </div>
         <div class="col-md-4 text-end">
-            <a href="{% url 'admin_hub:booking_list' %}" class="btn btn-secondary" style="padding: 0.5rem 1.5rem;">
+            <a href="{% url 'admin_hub:booking_list' %}" class="btn btn-secondary" style="padding: 0.5rem 1.5rem; font-weight: 500;">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
         </div>
     </div>
 
+    <!-- Messages -->
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -28,91 +29,132 @@
     <div class="row">
         <div class="col-md-8">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0" style="background: #f8f9fa !important;">
-                    <h5 class="mb-0" style="font-weight: 600;">📝 Form Booking</h5>
+                <div class="card-header border-bottom" style="background: linear-gradient(135deg, #ff9800 0%, #fb8c00 100%); padding: 1.2rem 2rem;">
+                    <h5 class="mb-0" style="font-weight: 700; color: white; font-size: 1.1rem; letter-spacing: 0.3px;">📝 Form Booking Baru</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="padding: 2rem;">
                     <form method="post" action="{% url 'admin_hub:booking_create' %}">
                         {% csrf_token %}
 
-                        <!-- Customer Selection -->
-                        <h6 class="mb-3 mt-0" style="font-weight: 600; color: #333;">👤 Pilih Pelanggan & Motor</h6>
-                        <div class="mb-3">
-                            <label for="customerId" class="form-label" style="font-weight: 600; color: #333;">Pelanggan</label>
-                            <select class="form-select" id="customerId" name="customer_id" required style="border-radius: 4px;">
-                                <option value="">-- Pilih Pelanggan --</option>
-                                {% for customer in customers %}
-                                    <option value="{{ customer.pk }}" {% if form_data.customer_id|stringformat:"s" == customer.pk|stringformat:"s" %}selected{% endif %}>
-                                        {{ customer.get_full_name|default:customer.username }} ({{ customer.username }})
-                                    </option>
-                                {% endfor %}
-                            </select>
+                        <!-- Section: Pelanggan & Motor -->
+                        <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #f0f0f0;">
+                            <h6 style="font-weight: 600; color: #666; font-size: 0.9rem; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">👤 Data Pelanggan</h6>
+                            
+                            <div class="mb-4">
+                                <label for="customerId" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Pelanggan Terdaftar (Opsional)</label>
+                                <select class="form-select" id="customerId" name="customer_id" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                    <option value="">-- Pilih Pelanggan (jika sudah terdaftar) --</option>
+                                    {% for customer in customers %}
+                                        <option value="{{ customer.pk }}" {% if form_data.customer_id|stringformat:"s" == customer.pk|stringformat:"s" %}selected{% endif %}>
+                                            {{ customer.get_full_name|default:customer.username }} ({{ customer.username }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Kosongkan jika pelanggan belum terdaftar</small>
+                            </div>
+
+                            <div class="alert" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 0.9rem 1rem; margin-bottom: 1.2rem;">
+                                <small style="color: #856404; font-size: 0.85rem;"><i class="fas fa-exclamation-triangle"></i> <strong>Pelanggan Walk-in:</strong> Jika pelanggan belum terdaftar, isi data di bawah ini</small>
+                            </div>
+
+                            <div class="row mb-4" id="guestFields">
+                                <div class="col-md-6">
+                                    <label for="guestName" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Nama Pelanggan</label>
+                                    <input type="text" id="guestName" name="guest_name" class="form-control" value="{{ form_data.guest_name }}" placeholder="Nama lengkap pelanggan" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="guestPhone" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">No. Telepon</label>
+                                    <input type="text" id="guestPhone" name="guest_phone" class="form-control" value="{{ form_data.guest_phone }}" placeholder="08xxxxxxxxxx" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                </div>
+                            </div>
+
+                            <hr style="margin: 1.5rem 0; border-top: 1px dashed #ddd;">
+                            <h6 style="font-weight: 600; color: #666; font-size: 0.9rem; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">🏍️ Data Motor</h6>
+
+                            <div class="mb-4">
+                                <label for="motorId" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Motor Terdaftar (Opsional)</label>
+                                <select class="form-select" id="motorId" name="motor_id" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                    <option value="">-- Pilih Motor (jika sudah terdaftar) --</option>
+                                    {% for motor in motors %}
+                                        <option value="{{ motor.pk }}" data-owner="{{ motor.owner.pk }}" {% if form_data.motor_id|stringformat:"s" == motor.pk|stringformat:"s" %}selected{% endif %}>
+                                            {{ motor.license_plate }} - {{ motor.brand }} {{ motor.model }} ({{ motor.owner.get_full_name|default:motor.owner.username }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Kosongkan jika motor belum terdaftar</small>
+                            </div>
+
+                            <div class="alert" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 0.9rem 1rem; margin-bottom: 1.2rem;">
+                                <small style="color: #856404; font-size: 0.85rem;"><i class="fas fa-exclamation-triangle"></i> <strong>Motor Walk-in:</strong> Jika motor belum terdaftar, isi data di bawah ini</small>
+                            </div>
+
+                            <div id="motorWalkinFields">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="motorLicensePlate" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Plat Nomor</label>
+                                        <input type="text" id="motorLicensePlate" name="motor_license_plate" class="form-control" value="{{ form_data.motor_license_plate }}" placeholder="B 1234 XYZ" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); text-transform: uppercase;">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="motorBrand" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Merk</label>
+                                        <input type="text" id="motorBrand" name="motor_brand" class="form-control" value="{{ form_data.motor_brand }}" placeholder="Honda, Yamaha, dll" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                    </div>
+                                </div>
+                                <div class="row mb-0">
+                                    <div class="col-md-6">
+                                        <label for="motorModel" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Model/Tipe</label>
+                                        <input type="text" id="motorModel" name="motor_model" class="form-control" value="{{ form_data.motor_model }}" placeholder="Beat, Vario, dll" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="motorYear" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Tahun (Opsional)</label>
+                                        <input type="number" id="motorYear" name="motor_year" class="form-control" value="{{ form_data.motor_year }}" placeholder="2020" min="1900" max="2026" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="alert alert-info" style="padding: 0.75rem 1rem; border-radius: 4px;">
-                            <small><i class="fas fa-info-circle"></i> <strong>Atau</strong> isi data pelanggan baru untuk walk-in / pelanggan belum terdaftar</small>
+                        <!-- Section: Layanan -->
+                        <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #f0f0f0;">
+                            <h6 style="font-weight: 600; color: #666; font-size: 0.9rem; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">🔧 Jenis Layanan</h6>
+                            
+                            <div class="mb-0">
+                                <label for="serviceTypeId" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Pilih Layanan <span class="text-danger">*</span></label>
+                                <select class="form-select" id="serviceTypeId" name="service_type_id" required style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                    <option value="">-- Pilih Layanan --</option>
+                                    {% for service_type in service_types %}
+                                        <option value="{{ service_type.pk }}" {% if form_data.service_type_id|stringformat:"s" == service_type.pk|stringformat:"s" %}selected{% endif %}>
+                                            {{ service_type.name }} - Rp {{ service_type.base_price|floatformat:0 }} 
+                                            (⏱️ {{ service_type.estimated_duration }} menit)
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Pilih jenis layanan yang dibutuhkan pelanggan</small>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="guestName" class="form-label" style="font-weight: 600; color: #333;">Nama Pelanggan (Opsional)</label>
-                            <input type="text" id="guestName" name="guest_name" class="form-control" value="{{ form_data.guest_name }}" style="border-radius: 4px;">
+                        <!-- Section: Keluhan & Catatan -->
+                        <div style="margin-bottom: 2rem;">
+                            <h6 style="font-weight: 600; color: #666; font-size: 0.9rem; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">📝 Keluhan & Catatan</h6>
+                            
+                            <div class="mb-4">
+                                <label for="complaint" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Keluhan / Permintaan Pelanggan <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="complaint" name="complaint" rows="4" 
+                                          placeholder="Deskripsikan keluhan atau permintaan pelanggan dengan detail..." required style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); resize: vertical;">{{ form_data.complaint }}</textarea>
+                                <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Jelaskan masalah atau keluhan yang dialami pelanggan</small>
+                            </div>
+
+                            <div class="mb-0">
+                                <label for="notes" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Catatan Tambahan (Opsional)</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                          placeholder="Catatan untuk mekanik atau instruksi khusus..." style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); resize: vertical;">{{ form_data.notes }}</textarea>
+                                <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Catatan atau instruksi khusus untuk mekanik</small>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="guestPhone" class="form-label" style="font-weight: 600; color: #333;">No. Telepon Pelanggan (Opsional)</label>
-                            <input type="text" id="guestPhone" name="guest_phone" class="form-control" value="{{ form_data.guest_phone }}" style="border-radius: 4px;">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="motorId" class="form-label" style="font-weight: 600; color: #333;">🏍️ Motor</label>
-                            <select class="form-select" id="motorId" name="motor_id" required style="border-radius: 4px;">
-                                <option value="">-- Pilih Motor --</option>
-                                {% for motor in motors %}
-                                    <option value="{{ motor.pk }}" data-owner="{{ motor.owner.pk }}" {% if form_data.motor_id|stringformat:"s" == motor.pk|stringformat:"s" %}selected{% endif %}>
-                                        {{ motor.license_plate }} - {{ motor.brand }} {{ motor.model }} ({{ motor.owner.get_full_name|default:motor.owner.username }})
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <hr>
-
-                        <!-- Service Selection -->
-                        <h6 class="mb-3" style="font-weight: 600; color: #333;">🔧 Pilih Layanan</h6>
-                        <div class="mb-3">
-                            <label for="serviceTypeId" class="form-label" style="font-weight: 600; color: #333;">Jenis Layanan</label>
-                            <select class="form-select" id="serviceTypeId" name="service_type_id" required style="border-radius: 4px;">
-                                <option value="">-- Pilih Layanan --</option>
-                                {% for service_type in service_types %}
-                                    <option value="{{ service_type.pk }}" {% if form_data.service_type_id|stringformat:"s" == service_type.pk|stringformat:"s" %}selected{% endif %}>
-                                        {{ service_type.name }} - Rp {{ service_type.base_price|floatformat:0 }} 
-                                        (⏱️ {{ service_type.estimated_duration }} menit)
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <hr>
-
-                        <!-- Complaint & Notes -->
-                        <h6 class="mb-3" style="font-weight: 600; color: #333;">📝 Keluhan & Catatan</h6>
-                        <div class="mb-3">
-                            <label for="complaint" class="form-label" style="font-weight: 600; color: #333;">Keluhan / Permintaan Pelanggan</label>
-                            <textarea class="form-control" id="complaint" name="complaint" rows="4" 
-                                      placeholder="Deskripsikan keluhan atau permintaan pelanggan..." required style="border-radius: 4px;">{{ form_data.complaint }}</textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="notes" class="form-label" style="font-weight: 600; color: #333;">Catatan Tambahan (Opsional)</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3" 
-                                      placeholder="Catatan untuk mekanik..." style="border-radius: 4px;">{{ form_data.notes }}</textarea>
-                        </div>
-
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.5rem;">
+                        <div class="d-flex gap-2 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.7rem 2rem; font-weight: 600; font-size: 0.95rem; background: linear-gradient(135deg, #ff9800 0%, #fb8c00 100%); border: none;">
                                 <i class="fas fa-save"></i> Buat Booking
                             </button>
-                            <a href="{% url 'admin_hub:booking_list' %}" class="btn btn-secondary" style="padding: 0.5rem 1.5rem;">
+                            <a href="{% url 'admin_hub:booking_list' %}" class="btn btn-secondary" style="padding: 0.7rem 2rem; font-weight: 600; font-size: 0.95rem;">
                                 <i class="fas fa-times"></i> Batal
                             </a>
                         </div>
@@ -124,22 +166,35 @@
         <!-- Info Sidebar -->
         <div class="col-md-4">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light border-0" style="background: #f8f9fa !important;">
-                    <h6 class="mb-0" style="font-weight: 600;"><i class="fas fa-lightbulb"></i> Informasi</h6>
+                <div class="card-header border-bottom" style="background: linear-gradient(135deg, #ff9800 0%, #fb8c00 100%); padding: 1.2rem 2rem;">
+                    <h6 class="mb-0" style="font-weight: 700; color: white; font-size: 1rem; letter-spacing: 0.3px;"><i class="fas fa-lightbulb"></i> Informasi</h6>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <p class="mb-1"><strong>Tipe Booking:</strong></p>
-                        <p><span class="badge bg-secondary" style="padding: 0.5rem 0.75rem;">🚶 Walk-in</span></p>
+                <div class="card-body" style="padding: 1.8rem;">
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 1px solid #f0f0f0;">
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">🚶 Tipe Booking</h6>
+                        <span class="badge bg-secondary" style="padding: 0.5rem 0.75rem; font-size: 0.85rem; font-weight: 500;">Walk-in</span>
+                        <p class="text-muted mt-2 mb-0" style="font-size: 0.85rem; line-height: 1.5; color: #666;">Untuk pelanggan yang datang langsung ke bengkel</p>
                     </div>
-                    <div class="mb-3">
-                        <p class="mb-1"><strong>Status Awal:</strong></p>
-                        <p><span class="badge bg-warning" style="padding: 0.5rem 0.75rem;">⏳ Menunggu</span></p>
+                    
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 1px solid #f0f0f0;">
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">⏳ Status Awal</h6>
+                        <span class="badge bg-warning" style="padding: 0.5rem 0.75rem; font-size: 0.85rem; font-weight: 500;">Menunggu</span>
+                        <p class="text-muted mt-2 mb-0" style="font-size: 0.85rem; line-height: 1.5; color: #666;">Booking baru akan dibuat dengan status "Menunggu"</p>
                     </div>
-                    <hr>
-                    <p class="text-muted small mb-0">
-                        Booking baru akan dibuat dengan status "Menunggu". Admin dapat approve dan menugaskan mekanik setelah booking dibuat.
-                    </p>
+                    
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 1px solid #f0f0f0;">
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">📋 Cara Penggunaan</h6>
+                        <ul class="text-muted mb-0" style="font-size: 0.85rem; line-height: 1.7; color: #666; padding-left: 1.2rem;">
+                            <li>Jika pelanggan sudah terdaftar: pilih dari dropdown pelanggan dan motor</li>
+                            <li>Jika pelanggan walk-in: isi nama, telepon, dan data motor secara manual</li>
+                            <li>Data pelanggan dan motor walk-in akan otomatis tersimpan di database</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">📋 Langkah Selanjutnya</h6>
+                        <p class="text-muted mb-0" style="font-size: 0.85rem; line-height: 1.5; color: #666;">Setelah booking dibuat, admin dapat approve dan menugaskan mekanik melalui halaman detail booking.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -147,13 +202,16 @@
 </div>
 
     <script>
-    // Optional: filter motors by selected customer
+    // Filter motors by selected customer
     document.getElementById('customerId').addEventListener('change', function(e) {
         const customerId = e.target.value;
         const motorSelect = document.getElementById('motorId');
+        const guestFields = document.getElementById('guestFields');
+        const motorWalkinFields = document.getElementById('motorWalkinFields');
+        
+        // Filter motor options
         for (let i = 0; i < motorSelect.options.length; i++) {
             const opt = motorSelect.options[i];
-            // each motor option has data-owner attribute (set server-side below)
             const owner = opt.getAttribute('data-owner');
             if (!customerId) {
                 opt.style.display = '';
@@ -163,7 +221,38 @@
                 opt.style.display = 'none';
             }
         }
+        
+        // Toggle guest fields
+        if (customerId) {
+            // Pelanggan terdaftar dipilih - sembunyikan guest fields
+            document.getElementById('guestName').removeAttribute('required');
+            document.getElementById('guestPhone').removeAttribute('required');
+        } else {
+            // Tidak ada pelanggan - tampilkan guest fields dan set required
+            document.getElementById('guestName').value = '';
+            document.getElementById('guestPhone').value = '';
+        }
+        
         motorSelect.value = '';
+    });
+    
+    // Toggle motor walk-in fields based on motor selection
+    document.getElementById('motorId').addEventListener('change', function(e) {
+        const motorId = e.target.value;
+        const motorWalkinFields = document.getElementById('motorWalkinFields');
+        
+        if (motorId) {
+            // Motor terdaftar dipilih - clear walk-in fields
+            document.getElementById('motorLicensePlate').value = '';
+            document.getElementById('motorBrand').value = '';
+            document.getElementById('motorModel').value = '';
+            document.getElementById('motorYear').value = '';
+        }
+    });
+    
+    // Auto-uppercase license plate
+    document.getElementById('motorLicensePlate').addEventListener('input', function(e) {
+        e.target.value = e.target.value.toUpperCase();
     });
     </script>
 {% endblock %}

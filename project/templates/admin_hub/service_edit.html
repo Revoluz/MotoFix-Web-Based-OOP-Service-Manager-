@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Layanan - MotoFix{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="font-weight: 600; color: #333;">✏️ Edit Jenis Layanan</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'admin_hub:service_list' %}" class="btn btn-secondary" style="padding: 0.5rem 1.5rem; font-weight: 500;">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-bottom" style="background: linear-gradient(135deg, #ff9800 0%, #fb8c00 100%); padding: 1.2rem 2rem;">
+                    <h5 class="mb-0" style="font-weight: 700; color: white; font-size: 1.1rem; letter-spacing: 0.3px;">📝 Form Edit Layanan</h5>
+                </div>
+                <div class="card-body" style="padding: 2rem;">
+                    <form method="post" action="{% url 'admin_hub:service_edit' service.pk %}">
+                        {% csrf_token %}
+
+                        <!-- Section: Informasi Dasar -->
+                        <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #f0f0f0;">
+                            <h6 style="font-weight: 600; color: #666; font-size: 0.9rem; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">📌 Informasi Dasar Layanan</h6>
+                            
+                            <div class="mb-4">
+                                <label for="name" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Nama Layanan <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       placeholder="Contoh: Servis Berkala, Ganti Oli, dll"
+                                       value="{{ service.name }}" required style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Nama unik untuk jenis layanan</small>
+                            </div>
+
+                            <div class="mb-0">
+                                <label for="description" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Deskripsi</label>
+                                <textarea class="form-control" id="description" name="description" rows="4"
+                                          placeholder="Deskripsi detail tentang layanan ini" style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); resize: vertical;">{{ service.description }}</textarea>
+                                <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Jelaskan apa yang termasuk dalam layanan ini</small>
+                            </div>
+                        </div>
+
+                        <!-- Section: Harga & Waktu -->
+                        <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid #f0f0f0;">
+                            <h6 style="font-weight: 600; color: #666; font-size: 0.9rem; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">💵 Harga & Estimasi Waktu</h6>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-0">
+                                        <label for="base_price" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Harga Dasar (Rp) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="base_price" name="base_price"
+                                               placeholder="0"
+                                               value="{{ service.base_price|floatformat:0 }}" step="1" min="0" required style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Harga standar untuk layanan ini</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-0">
+                                        <label for="estimated_duration" class="form-label" style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem; display: block;">Estimasi Waktu (Menit) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="estimated_duration" name="estimated_duration"
+                                               placeholder="0"
+                                               value="{{ service.estimated_duration }}" required style="border-radius: 5px; border: 1px solid #ddd; padding: 0.7rem 0.85rem; font-size: 0.9rem; line-height: 1.5; background: #fff; transition: all 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <small class="text-muted" style="font-size: 0.8rem; margin-top: 0.4rem; display: block; color: #999;">Perkiraan waktu pengerjaan</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: Status -->
+                        <div style="margin-bottom: 2rem;">
+                            <h6 style="font-weight: 600; color: #666; font-size: 0.9rem; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">🔄 Status Layanan</h6>
+                            
+                            <div class="form-check form-switch" style="padding-left: 2.5rem;">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                       {% if service.is_active %}checked{% endif %}
+                                       style="width: 3rem; height: 1.5rem; cursor: pointer;">
+                                <label class="form-check-label" for="is_active" style="font-weight: 500; color: #333; font-size: 0.9rem; margin-left: 0.5rem; cursor: pointer;">
+                                    Layanan Aktif
+                                </label>
+                                <small class="text-muted d-block" style="font-size: 0.8rem; margin-top: 0.4rem; margin-left: 0.5rem; color: #999;">Hanya layanan aktif yang dapat dipilih saat booking</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.7rem 2rem; font-weight: 600; font-size: 0.95rem; background: linear-gradient(135deg, #ff9800 0%, #fb8c00 100%); border: none;">
+                                <i class="fas fa-save"></i> Update Layanan
+                            </button>
+                            <a href="{% url 'admin_hub:service_list' %}" class="btn btn-secondary" style="padding: 0.7rem 2rem; font-weight: 600; font-size: 0.95rem;">
+                                <i class="fas fa-times"></i> Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panduan -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-bottom" style="background: linear-gradient(135deg, #ff9800 0%, #fb8c00 100%); padding: 1.2rem 2rem;">
+                    <h6 class="mb-0" style="font-weight: 700; color: white; font-size: 1rem; letter-spacing: 0.3px;"><i class="fas fa-lightbulb"></i> Panduan Pengisian</h6>
+                </div>
+                <div class="card-body" style="padding: 1.8rem;">
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 1px solid #f0f0f0;">
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">📝 Nama Layanan</h6>
+                        <p class="text-muted" style="font-size: 0.85rem; line-height: 1.5; margin: 0; color: #666;">Nama yang jelas dan singkat untuk jenis layanan. Contoh: Servis Berkala, Ganti Oli, Tune-up Engine.</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 1px solid #f0f0f0;">
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">📋 Deskripsi</h6>
+                        <p class="text-muted" style="font-size: 0.85rem; line-height: 1.5; margin: 0; color: #666;">Jelaskan detail tentang apa yang termasuk dalam layanan ini. Contoh apa saja yang dikerjakan atau diperiksa.</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 1px solid #f0f0f0;">
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">💰 Harga Dasar</h6>
+                        <p class="text-muted" style="font-size: 0.85rem; line-height: 1.5; margin: 0; color: #666;">Harga standar untuk layanan ini. Bisa disesuaikan per booking sesuai kebutuhan pelanggan.</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.2rem; border-bottom: 1px solid #f0f0f0;">
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">⏱️ Estimasi Waktu</h6>
+                        <p class="text-muted" style="font-size: 0.85rem; line-height: 1.5; margin: 0; color: #666;">Perkiraan waktu pengerjaan dalam satuan menit. Contoh: 30, 60, 120 menit.</p>
+                    </div>
+                    
+                    <div>
+                        <h6 style="font-weight: 600; color: #333; font-size: 0.9rem; margin-bottom: 0.6rem;">🔄 Status Aktif</h6>
+                        <p class="text-muted" style="font-size: 0.85rem; line-height: 1.5; margin: 0; color: #666;">Nonaktifkan layanan jika tidak lagi tersedia. Layanan nonaktif tidak akan muncul di form booking.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

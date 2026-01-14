@@ -40,6 +40,17 @@ def admin_required(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
+def cashier_or_admin_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('accounts:login')
+        if not (request.user.is_admin_user or request.user.is_cashier):
+            messages.error(request, 'Akses ditolak! Halaman ini khusus untuk kasir atau admin.')
+            return redirect('admin_hub:booking_list')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
 # Autentikasi & Akun
 def login(request):
     """Halaman login untuk semua user"""

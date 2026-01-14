@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Kelola Transaksi - MotoFix{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="font-weight: 600; color: #333;">
+            <i class="fas fa-file-invoice-dollar"></i> Kelola Transaksi
+        </h2>
+        <a href="{% url 'admin_hub:admin_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Filter Status -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <label for="status" class="mb-0">Filter Status:</label>
+                <select name="status" id="status" class="form-select" style="width: auto;">
+                    <option value="">Semua</option>
+                    <option value="finished" {% if status_filter == 'finished' %}selected{% endif %}>Selesai (Belum Dibayar)</option>
+                    <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Sudah Dibayar</option>
+                </select>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                {% if status_filter %}
+                <a href="{% url 'admin_hub:transaction_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card text-center border-left-warning shadow-sm">
+                <div class="card-body">
+                    <h3 class="text-warning mb-0">{{ finished_count }}</h3>
+                    <p class="text-muted mb-0">Menunggu Pembayaran</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-center border-left-success shadow-sm">
+                <div class="card-body">
+                    <h3 class="text-success mb-0">{{ paid_count }}</h3>
+                    <p class="text-muted mb-0">Sudah Dibayar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction List -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Daftar Transaksi</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if booking_list %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr style="background: #ff9800; border-bottom: 2px solid #dee2e6;">
+                            <th style="padding: 1rem 0.75rem; color: white; font-weight: 600;">Nomor Booking</th>
+                            <th style="padding: 1rem 0.75rem; color: white; font-weight: 600;">Tanggal Selesai</th>
+                            <th style="padding: 1rem 0.75rem; color: white; font-weight: 600;">Pelanggan</th>
+                            <th style="padding: 1rem 0.75rem; color: white; font-weight: 600;">Motor</th>
+                            <th style="padding: 1rem 0.75rem; color: white; font-weight: 600;">Layanan</th>
+                            <th style="padding: 1rem 0.75rem; color: white; font-weight: 600;">Status</th>
+                            <th style="padding: 1rem 0.75rem; color: white; font-weight: 600; text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in booking_list %}
+                        <tr style="vertical-align: middle;">
+                            <td style="padding: 0.75rem;">
+                                <strong>{{ item.booking.booking_number }}</strong>
+                            </td>
+                            <td style="padding: 0.75rem;">
+                                {% if item.booking.finish_date %}
+                                    {{ item.booking.finish_date|date:"d M Y" }}<br>
+                                    <small class="text-muted">{{ item.booking.finish_date|date:"H:i" }}</small>
+                                {% else %}
+                                    <em class="text-muted">-</em>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 0.75rem;">
+                                <strong>{{ item.booking.customer.get_full_name }}</strong><br>
+                                <small class="text-muted">{{ item.booking.customer.phone|default:"-" }}</small>
+                            </td>
+                            <td style="padding: 0.75rem;">
+                                <strong>{{ item.booking.motor.license_plate }}</strong><br>
+                                <small class="text-muted">{{ item.booking.motor.brand }} {{ item.booking.motor.model }}</small>
+                            </td>
+                            <td style="padding: 0.75rem;">{{ item.booking.service_type.name }}</td>
+                            <td style="padding: 0.75rem;">
+                                {% if item.booking.status == 'finished' %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-clock"></i> Menunggu Pembayaran
+                                    </span>
+                                {% elif item.booking.status == 'paid' %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i> Sudah Dibayar
+                                    </span>
+                                {% endif %}
+                            </td>
+                             <button onclick="printInvoice({{ item.booking.pk }})" class="btn btn-sm btn-success">
+                                        <i class="fas fa-print"></i> Cetak Invoice
+                                    </button>
+                            <td style="padding: 0.75rem; text-align: center;">
+                                {% if item.booking.status == 'finished' and not item.invoice %}
+                                    <a href="{% url 'admin_hub:create_invoice' item.booking.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-file-invoice"></i> Buat Invoice
+                                    </a>
+                                {% elif item.invoice and item.booking.status == 'paid' %}
+                                    <a href="{% url 'admin_hub:booking_detail' item.booking.pk %}" class="btn btn-sm btn-info me-1">
+                                        <i class="fas fa-eye"></i> Lihat Detail
+                                    </a>
+                                    <button onclick="printInvoice({{ item.booking.pk }})" class="btn btn-sm btn-success">
+                                        <i class="fas fa-print"></i> Cetak Invoice
+                                    </button>
+                                {% elif item.invoice %}
+                                    <a href="{% url 'admin_hub:booking_detail' item.booking.pk %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> Lihat Detail
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'admin_hub:booking_detail' item.booking.pk %}" class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-eye"></i> Detail
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem; color: #ddd;">📭</div>
+                <p style="font-size: 1.1rem; color: #666;">
+                    {% if status_filter %}
+                        Tidak ada transaksi dengan status yang dipilih
+                    {% else %}
+                        Belum ada transaksi yang perlu diproses
+                    {% endif %}
+                </p>
+                {% if status_filter %}
+                <a href="{% url 'admin_hub:transaction_list' %}" class="btn btn-secondary mt-2">Lihat Semua</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h6 class="mb-3"><i class="fas fa-info-circle"></i> Informasi</h6>
+            <ul class="mb-0" style="padding-left: 1.25rem;">
+                <li>Halaman ini menampilkan booking yang sudah selesai dikerjakan dan siap untuk pembayaran</li>
+                <li>Klik "Buat Invoice" untuk membuat invoice pembayaran untuk booking yang sudah selesai</li>
+                <li>Setelah invoice dibuat, status akan berubah menjadi "Sudah Dibayar"</li>
+                <li>Klik "Cetak Invoice" untuk mencetak invoice pembayaran yang sudah lunas</li>
+                <li>Gunakan filter untuk melihat transaksi berdasarkan status pembayaran</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+function printInvoice(bookingId) {
+    // Buka halaman invoice di tab baru
+    const invoiceUrl = `/customer/invoice/${bookingId}/`;
+    const printWindow = window.open(invoiceUrl, '_blank');
+    
+    // Tunggu halaman load, lalu print otomatis
+    printWindow.onload = function() {
+        setTimeout(function() {
+            printWindow.print();
+        }, 500);
+    };
+}
+</script>
+
+<style>
+    .border-left-warning {
+        border-left: 4px solid #ffc107;
+    }
+    .border-left-success {
+        border-left: 4px solid #28a745;
+    }
+</style>
+{% endblock %}

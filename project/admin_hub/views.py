@@ -3,11 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from accounts.models import User
-from accounts.views import staff_required, admin_required
+from accounts.views import staff_required, admin_required, cashier_or_admin_required
 from customer.models import ServiceBooking, Motor, ServiceType
 
 # Panel Admin & Manajemen (Integrated Hub)
-@admin_required
+@staff_required
 def admin_dashboard(request):
     """Monitoring seluruh antrian & status bengkel"""
     # Statistik booking
@@ -113,7 +113,9 @@ def service_edit(request, pk):
         # Validasi
         if not name or not base_price or not estimated_duration:
             messages.error(request, 'Semua field harus diisi!')
-            return redirect('admin_hub:service_list')
+            return render(request, 'admin_hub/service_edit.html', {
+                'service': service,
+            })
         
         try:
             service.name = name
@@ -126,9 +128,13 @@ def service_edit(request, pk):
             return redirect('admin_hub:service_list')
         except Exception as e:
             messages.error(request, f'Gagal mengupdate layanan: {str(e)}')
-            return redirect('admin_hub:service_list')
+            return render(request, 'admin_hub/service_edit.html', {
+                'service': service,
+            })
     
-    return redirect('admin_hub:service_list')
+    return render(request, 'admin_hub/service_edit.html', {
+        'service': service,
+    })
 
 @admin_required
 def mechanic_list(request):
@@ -193,7 +199,10 @@ def user_create(request):
                 last_name=last_name,
                 specialization=specialization
             )
-            messages.success(request, f'User {username} berhasil ditambahkan!')
+            messages.success(request, 
+                f'User {username} berhasil ditambahkan! '
+                f'Username: {username} | Password: {password} '
+                f'(Berikan informasi login ini kepada user)')
             return redirect('admin_hub:user_list')
         except Exception as e:
             messages.error(request, f'Gagal menambahkan user: {str(e)}')
@@ -292,7 +301,7 @@ def user_delete(request, pk):
 
 
 # === Manajemen Booking Service ===
-@admin_required
+@staff_required
 def booking_list(request):
     """List semua booking service dengan filter status"""
     status = request.GET.get('status', '')
@@ -318,9 +327,11 @@ def booking_list(request):
     return render(request, 'admin_hub/booking_list.html', context)
 
 
-@admin_required
+@staff_required
 def booking_detail(request, pk):
     """Detail booking service"""
+    from customer.models import Invoice
+    
     booking = get_object_or_404(ServiceBooking.objects.select_related(
         'customer', 'motor', 'service_type', 'mechanic'
     ).prefetch_related('spare_parts', 'additional_services'), pk=pk)
@@ -328,16 +339,23 @@ def booking_detail(request, pk):
     # include role case-insensitive to avoid missing mechanics due to unexpected role values
     mechanics = User.objects.filter(role__iexact='mechanic').order_by('first_name', 'username')
     
+    # Cek apakah invoice sudah ada
+    try:
+        invoice = Invoice.objects.get(service_booking=booking)
+    except Invoice.DoesNotExist:
+        invoice = None
+    
     context = {
         'booking': booking,
         'mechanics': mechanics,
         'status_choices': ServiceBooking.STATUS_CHOICES,
+        'invoice': invoice,
     }
     
     return render(request, 'admin_hub/booking_detail.html', context)
 
 
-@admin_required
+@cashier_or_admin_required
 def booking_approve(request, pk):
     """Approve booking (ubah status dari pending ke assigned)"""
     booking = get_object_or_404(ServiceBooking, pk=pk)
@@ -357,7 +375,7 @@ def booking_approve(request, pk):
         return redirect('admin_hub:booking_detail', pk=pk)
 
 
-@admin_required
+@cashier_or_admin_required
 def booking_assign_mechanic(request, pk):
     """Assign mekanik ke booking"""
     booking = get_object_or_404(ServiceBooking, pk=pk)
@@ -391,7 +409,7 @@ def booking_assign_mechanic(request, pk):
     return redirect('admin_hub:booking_detail', pk=pk)
 
 
-@admin_required
+@cashier_or_admin_required
 def booking_start(request, pk):
     """Mulai pengerjaan booking"""
     booking = get_object_or_404(ServiceBooking, pk=pk)
@@ -411,7 +429,7 @@ def booking_start(request, pk):
         return redirect('admin_hub:booking_detail', pk=pk)
 
 
-@admin_required
+@cashier_or_admin_required
 def booking_finish(request, pk):
     """Selesaikan booking"""
     booking = get_object_or_404(ServiceBooking, pk=pk)
@@ -431,7 +449,103 @@ def booking_finish(request, pk):
         return redirect('admin_hub:booking_detail', pk=pk)
 
 
-@admin_required
+@cashier_or_admin_required
+def invoice_detail(request, pk):
+    """Detail invoice untuk admin/kasir"""
+    from customer.models import Invoice, SparePart, AdditionalService
+    
+    booking = get_object_or_404(ServiceBooking, pk=pk)
+    
+    # Get invoice
+    try:
+        invoice = Invoice.objects.get(service_booking=booking)
+    except Invoice.DoesNotExist:
+        messages.error(request, 'Invoice belum dibuat untuk booking ini!')
+        return redirect('admin_hub:booking_detail', pk=pk)
+    
+    # Get spare parts and additional services
+    spare_parts = SparePart.objects.filter(service_booking=booking)
+    additional_services = AdditionalService.objects.filter(service_booking=booking)
+    
+    context = {
+        'booking': booking,
+        'invoice': invoice,
+        'spare_parts': spare_parts,
+        'additional_services': additional_services,
+    }
+    
+    return render(request, 'admin_hub/invoice_detail.html', context)
+
+
+@cashier_or_admin_required
+def create_invoice(request, pk):
+    """Buat invoice untuk booking yang sudah selesai"""
+    from customer.models import Invoice, SparePart, AdditionalService
+    from decimal import Decimal
+    
+    booking = get_object_or_404(ServiceBooking, pk=pk)
+    
+    # Cek apakah booking sudah selesai atau paid
+    if booking.status not in ['finished', 'paid']:
+        messages.error(request, 'Invoice hanya bisa dibuat untuk booking yang sudah selesai!')
+        return redirect('admin_hub:booking_detail', pk=pk)
+    
+    # Cek apakah invoice sudah ada
+    try:
+        existing_invoice = Invoice.objects.get(service_booking=booking)
+        messages.warning(request, 'Invoice sudah dibuat sebelumnya!')
+        return redirect('admin_hub:booking_detail', pk=pk)
+    except Invoice.DoesNotExist:
+        pass
+    
+    if request.method == 'POST':
+        payment_method = request.POST.get('payment_method', 'cash')
+        
+        try:
+            # Hitung biaya layanan dasar
+            service_cost = Decimal(str(booking.service_type.base_price))
+            
+            # Hitung total biaya suku cadang
+            spare_parts = SparePart.objects.filter(service_booking=booking)
+            spare_parts_cost = sum(Decimal(str(sp.price * sp.quantity)) for sp in spare_parts)
+            
+            # Hitung total biaya jasa tambahan
+            additional_services = AdditionalService.objects.filter(service_booking=booking)
+            additional_cost = sum(Decimal(str(ads.price)) for ads in additional_services)
+            
+            # Total biaya
+            total_cost = service_cost + spare_parts_cost + additional_cost
+            
+            # Buat invoice
+            invoice = Invoice.objects.create(
+                service_booking=booking,
+                invoice_number=f"INV-{booking.booking_number}",
+                service_cost=service_cost,
+                spare_parts_cost=spare_parts_cost,
+                additional_cost=additional_cost,
+                total_cost=total_cost,
+                payment_method=payment_method,
+                paid_amount=total_cost,
+                change_amount=Decimal('0'),
+                cashier=request.user
+            )
+            
+            # Update status booking menjadi paid jika belum
+            if booking.status == 'finished':
+                booking.status = 'paid'
+                booking.save()
+            
+            messages.success(request, f'Invoice {invoice.invoice_number} berhasil dibuat! Total: Rp {total_cost:,.0f}')
+            return redirect('admin_hub:booking_detail', pk=pk)
+            
+        except Exception as e:
+            messages.error(request, f'Gagal membuat invoice: {str(e)}')
+            return redirect('admin_hub:booking_detail', pk=pk)
+    
+    return redirect('admin_hub:booking_detail', pk=pk)
+
+
+@cashier_or_admin_required
 def booking_cancel(request, pk):
     """Batalkan booking"""
     booking = get_object_or_404(ServiceBooking, pk=pk)
@@ -453,7 +567,7 @@ def booking_cancel(request, pk):
     return render(request, 'admin_hub/booking_cancel.html', {'booking': booking})
 
 
-@admin_required
+@cashier_or_admin_required
 def booking_create(request):
     """Buat booking baru (walk-in)"""
     motors = Motor.objects.select_related('owner').all()
@@ -466,13 +580,20 @@ def booking_create(request):
         customer_id = request.POST.get('customer_id')
         guest_name = request.POST.get('guest_name', '').strip()
         guest_phone = request.POST.get('guest_phone', '').strip()
+        
+        # Walk-in motor fields
+        motor_license_plate = request.POST.get('motor_license_plate', '').strip()
+        motor_brand = request.POST.get('motor_brand', '').strip()
+        motor_model = request.POST.get('motor_model', '').strip()
+        motor_year = request.POST.get('motor_year', '').strip()
+        
         service_type_id = request.POST.get('service_type_id')
         complaint = request.POST.get('complaint')
         notes = request.POST.get('notes', '')
 
-        # Validasi sederhana
-        if not customer_id or not motor_id or not service_type_id or not complaint:
-            messages.error(request, 'Mohon isi semua field yang diperlukan!')
+        # Validasi: harus ada service_type dan complaint
+        if not service_type_id or not complaint:
+            messages.error(request, 'Mohon isi jenis layanan dan keluhan pelanggan!')
             return render(request, 'admin_hub/booking_create.html', {
                 'motors': motors,
                 'service_types': service_types,
@@ -481,32 +602,74 @@ def booking_create(request):
             })
 
         try:
-            motor = Motor.objects.get(id=motor_id)
-
-            # Determine customer: existing or guest
+            # === 1. Tentukan Customer ===
             if customer_id:
+                # Pelanggan terdaftar
                 customer = User.objects.get(id=customer_id)
+                guest_password = None
             else:
-                # create guest user if guest_name and guest_phone provided
+                # Pelanggan walk-in: buat user guest
                 if not guest_name or not guest_phone:
-                    raise ValueError('Pilih pelanggan atau isi nama dan nomor telepon untuk walk-in')
-                # generate unique username
-                base = ''.join(ch for ch in guest_phone if ch.isdigit()) or 'guest'
-                import time, random
-                uname = f"guest{base}{int(time.time())}{random.randint(100,999)}"
-                # ensure unique
+                    raise ValueError('Untuk pelanggan walk-in, mohon isi nama dan nomor telepon!')
+                
+                # Generate unique username yang lebih pendek
+                import time, random, string
+                # Ambil 4 digit terakhir nomor telepon
+                phone_digits = ''.join(ch for ch in guest_phone if ch.isdigit())
+                last_digits = phone_digits[-4:] if len(phone_digits) >= 4 else phone_digits
+                # Generate 3 digit random
+                random_suffix = ''.join(random.choices(string.digits, k=3))
+                uname = f"guest{last_digits}{random_suffix}"
+                
+                # Pastikan unique
+                counter = 1
+                base_uname = uname
                 while User.objects.filter(username=uname).exists():
-                    uname = f"{uname}{random.randint(1,9)}"
-                customer = User.objects.create(
+                    uname = f"{base_uname}{counter}"
+                    counter += 1
+                
+                # Generate random password (8 karakter)
+                guest_password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+                
+                customer = User.objects.create_user(
                     username=uname,
+                    password=guest_password,  # Set password agar bisa login
                     role='customer',
                     first_name=guest_name,
                     phone=guest_phone,
                 )
-                # set unusable password
-                customer.set_unusable_password()
                 customer.save()
 
+            # === 2. Tentukan Motor ===
+            if motor_id:
+                # Motor dari database
+                motor = Motor.objects.get(id=motor_id)
+            else:
+                # Motor walk-in: input manual
+                if not motor_license_plate or not motor_brand or not motor_model:
+                    raise ValueError('Untuk motor walk-in, mohon isi plat nomor, merk, dan model!')
+                
+                if not motor_year:
+                    motor_year = timezone.now().year
+                
+                # Cek apakah motor dengan plat nomor ini sudah ada
+                motor, created = Motor.objects.get_or_create(
+                    license_plate=motor_license_plate.upper(),
+                    defaults={
+                        'owner': customer,
+                        'brand': motor_brand,
+                        'model': motor_model,
+                        'year': int(motor_year) if motor_year else timezone.now().year,
+                    }
+                )
+                
+                if not created:
+                    # Motor sudah ada, update owner jika berbeda
+                    if motor.owner != customer:
+                        motor.owner = customer
+                        motor.save()
+
+            # === 3. Buat Booking ===
             service_type = ServiceType.objects.get(id=service_type_id)
 
             booking = ServiceBooking.objects.create(
@@ -519,10 +682,33 @@ def booking_create(request):
                 status='pending'
             )
 
-            messages.success(request, f'Booking {booking.booking_number} berhasil dibuat!')
+            # Success message dengan info login untuk guest user
+            if guest_password:
+                messages.success(request, 
+                    f'Booking {booking.booking_number} berhasil dibuat! '
+                    f'Akun pelanggan dibuat: Username: {customer.username} | Password: {guest_password} '
+                    f'(Berikan informasi login ini kepada pelanggan)')
+            else:
+                messages.success(request, f'Booking {booking.booking_number} berhasil dibuat! Motor: {motor.license_plate}')
+            
             return redirect('admin_hub:booking_detail', pk=booking.pk)
+            
+        except ValueError as e:
+            messages.error(request, str(e))
+            return render(request, 'admin_hub/booking_create.html', {
+                'motors': motors,
+                'service_types': service_types,
+                'customers': customers,
+                'form_data': request.POST,
+            })
         except Exception as e:
             messages.error(request, f'Gagal membuat booking: {str(e)}')
+            return render(request, 'admin_hub/booking_create.html', {
+                'motors': motors,
+                'service_types': service_types,
+                'customers': customers,
+                'form_data': request.POST,
+            })
     
     context = {
         'motors': motors,
@@ -533,7 +719,7 @@ def booking_create(request):
     return render(request, 'admin_hub/booking_create.html', context)
 
 
-@admin_required
+@cashier_or_admin_required
 def booking_update_status(request, pk):
     """Update status booking"""
     booking = get_object_or_404(ServiceBooking, pk=pk)

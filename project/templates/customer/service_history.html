@@ -5,10 +5,29 @@
 {% block content %}
 <h2>📜 Riwayat Servis</h2>
 
+<!-- Filter Status -->
+<div class="card" style="margin-bottom: 1rem;">
+    <form method="get" style="display: flex; gap: 0.5rem; align-items: center;">
+        <label for="status" style="margin: 0;">Filter Status:</label>
+        <select name="status" id="status" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+            <option value="">Semua Status</option>
+            {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn" style="padding: 0.5rem 1rem;">Filter</button>
+        {% if status_filter %}
+        <a href="{% url 'customer:service_history' %}" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Reset</a>
+        {% endif %}
+    </form>
+</div>
+
 <div class="card">
+    {% if bookings %}
     <table style="width: 100%; border-collapse: collapse;">
         <thead>
             <tr style="background: #f4f4f4;">
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Nomor Booking</th>
                 <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Tanggal</th>
                 <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Motor</th>
                 <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Layanan</th>
@@ -17,16 +36,66 @@
             </tr>
         </thead>
         <tbody>
+            {% for booking in bookings %}
             <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">2024-12-15</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Honda Vario 150</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Servis Berkala</td>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;"><span style="background: #4caf50; color: white; padding: 0.25rem 0.5rem; border-radius: 3px;">Selesai</span></td>
                 <td style="padding: 0.75rem; border: 1px solid #ddd;">
-                    <a href="{% url 'customer:invoice_detail' 1 %}" class="btn" style="padding: 0.5rem 1rem;">Lihat Invoice</a>
+                    <strong>{{ booking.booking_number }}</strong>
+                </td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    {{ booking.booking_date|date:"d M Y" }}<br>
+                    <small style="color: #666;">{{ booking.booking_date|date:"H:i" }}</small>
+                </td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <strong>{{ booking.motor.license_plate }}</strong><br>
+                    <small style="color: #666;">{{ booking.motor.brand }} {{ booking.motor.model }}</small>
+                </td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ booking.service_type.name }}</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    {% if booking.status == 'pending' %}
+                        <span style="background: #ffc107; color: #333; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">⏳ {{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'assigned' %}
+                        <span style="background: #17a2b8; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">👤 {{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'in_progress' %}
+                        <span style="background: #6c757d; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">🔧 {{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'finished' %}
+                        <span style="background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">✓ {{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'paid' %}
+                        <span style="background: #007bff; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">💰 {{ booking.get_status_display }}</span>
+                    {% elif booking.status == 'cancelled' %}
+                        <span style="background: #dc3545; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">✗ {{ booking.get_status_display }}</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">
+                    <a href="{% url 'customer:invoice_detail' booking.pk %}" class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                        {% if booking.status == 'paid' or booking.status == 'finished' %}
+                            📄 Lihat Invoice
+                        {% else %}
+                            👁️ Lihat Detail
+                        {% endif %}
+                    </a>
                 </td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: #999;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+        <p style="font-size: 1.1rem; color: #666;">
+            {% if status_filter %}
+                Tidak ada booking dengan status yang dipilih
+            {% else %}
+                Belum ada riwayat servis
+            {% endif %}
+        </p>
+        {% if status_filter %}
+        <a href="{% url 'customer:service_history' %}" class="btn btn-secondary" style="margin-top: 1rem;">Lihat Semua</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<div style="margin-top: 1rem;">
+    <a href="{% url 'customer:customer_dashboard' %}" class="btn btn-secondary">🏠 Kembali ke Dashboard</a>
 </div>
 {% endblock %}

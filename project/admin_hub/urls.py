@@ -15,6 +15,8 @@ urlpatterns = [
     
     # Kasir & Pembayaran
     path('payment/<int:pk>/', views.process_payment, name='process_payment'),
+    path('invoice/create/<int:pk>/', views.create_invoice, name='create_invoice'),
+    path('invoice/<int:pk>/', views.invoice_detail, name='invoice_detail'),
     
     # Master Data
     path('services/', views.service_list, name='service_list'),

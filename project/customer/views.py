@@ -267,7 +267,7 @@ def invoice_detail(request, pk):
     
     # Try to get invoice
     try:
-        invoice = Invoice.objects.get(booking=booking)
+        invoice = Invoice.objects.get(service_booking=booking)
     except Invoice.DoesNotExist:
         invoice = None
     

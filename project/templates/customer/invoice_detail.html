@@ -2,51 +2,180 @@
 
 {% block title %}Invoice Detail - MotoFix{% endblock %}
 
+{% block extra_head %}
+<style>
+    @media print {
+        /* Hide semua navigation, header, footer saat print */
+        nav,
+        header,
+        .navbar,
+        .sidebar,
+        .nav,
+        .btn,
+        button,
+        a.btn,
+        .card > a,
+        .card > button,
+        body > nav,
+        body > header,
+        [role="navigation"] {
+            display: none !important;
+        }
+        
+        /* Reset body untuk print */
+        body {
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Pastikan konten full width */
+        .container,
+        .container-fluid {
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Styling untuk print */
+        .card {
+            box-shadow: none !important;
+            border: none !important;
+            page-break-inside: avoid;
+        }
+        
+        h2, h3 {
+            color: #000 !important;
+        }
+        
+        /* Hide tombol kembali dan print */
+        .card:last-child {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>🧾 Invoice Servis #{{ pk }}</h2>
+<h2>🧾 Invoice Servis {% if invoice %}#{{ invoice.invoice_number }}{% else %}#{{ booking.booking_number }}{% endif %}</h2>
+
+{% if not invoice %}
+<div class="card" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+    <p style="margin: 0; color: #856404;">⚠️ Invoice belum dibuat untuk booking ini. Silakan hubungi kasir untuk membuat invoice.</p>
+</div>
+{% endif %}
 
 <div class="card">
     <h3>Informasi Servis</h3>
-    <p><strong>Tanggal:</strong> 15 Desember 2024</p>
-    <p><strong>Motor:</strong> Honda Vario 150 - B 1234 XYZ</p>
-    <p><strong>Mekanik:</strong> Budi Santoso</p>
-    <p><strong>Layanan:</strong> Servis Berkala</p>
+    <p><strong>Nomor Booking:</strong> {{ booking.booking_number }}</p>
+    <p><strong>Tanggal Booking:</strong> {{ booking.booking_date|date:"d F Y H:i" }}</p>
+    {% if booking.finish_date %}
+    <p><strong>Tanggal Selesai:</strong> {{ booking.finish_date|date:"d F Y H:i" }}</p>
+    {% endif %}
+    <p><strong>Motor:</strong> {{ booking.motor.brand }} {{ booking.motor.model }} - {{ booking.motor.license_plate }}</p>
+    <p><strong>Mekanik:</strong> {% if booking.mechanic %}{{ booking.mechanic.get_full_name }}{% else %}Belum ditugaskan{% endif %}</p>
+    <p><strong>Layanan:</strong> {{ booking.service_type.name }}</p>
+    <p><strong>Status:</strong> <span class="badge {% if booking.status == 'paid' %}bg-primary{% elif booking.status == 'finished' %}bg-success{% elif booking.status == 'in_progress' %}bg-secondary{% elif booking.status == 'assigned' %}bg-info{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">{{ booking.get_status_display }}</span></p>
 </div>
 
+{% if invoice %}
 <div class="card">
     <h3>Detail Biaya</h3>
     <table style="width: 100%; border-collapse: collapse;">
         <thead>
             <tr style="background: #f4f4f4;">
                 <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Item</th>
-                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Qty</th>
-                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Harga</th>
-                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Total</th>
+                <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Jumlah</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Jasa Servis</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">1</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 50.000</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 50.000</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Biaya Jasa Servis ({{ booking.service_type.name }})</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp {{ invoice.service_cost|floatformat:0 }}</td>
+            </tr>
+            
+            {% if booking.spare_parts.exists %}
+            <tr style="background: #f9f9f9;">
+                <td colspan="2" style="padding: 0.5rem 0.75rem; border: 1px solid #ddd; font-weight: bold;">Suku Cadang:</td>
+            </tr>
+            {% for part in booking.spare_parts.all %}
+            <tr>
+                <td style="padding: 0.75rem; padding-left: 2rem; border: 1px solid #ddd;">
+                    {{ part.name }} 
+                    <small style="color: #666;">({{ part.quantity }} x Rp {{ part.unit_price|floatformat:0 }})</small>
+                </td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp {{ part.total_price|floatformat:0 }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd; font-weight: 500;">Total Suku Cadang</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd; font-weight: 500;">Rp {{ invoice.spare_parts_cost|floatformat:0 }}</td>
+            </tr>
+            {% endif %}
+            
+            {% if booking.additional_services.exists %}
+            <tr style="background: #f9f9f9;">
+                <td colspan="2" style="padding: 0.5rem 0.75rem; border: 1px solid #ddd; font-weight: bold;">Jasa Tambahan:</td>
+            </tr>
+            {% for service in booking.additional_services.all %}
+            <tr>
+                <td style="padding: 0.75rem; padding-left: 2rem; border: 1px solid #ddd;">
+                    {{ service.name }}
+                    {% if service.description %}<br><small style="color: #666;">{{ service.description }}</small>{% endif %}
+                </td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp {{ service.price|floatformat:0 }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd; font-weight: 500;">Total Jasa Tambahan</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd; font-weight: 500;">Rp {{ invoice.additional_cost|floatformat:0 }}</td>
+            </tr>
+            {% endif %}
+            
+            <tr style="background: #ff9800; color: white; font-weight: bold; font-size: 1.1rem;">
+                <td style="padding: 1rem 0.75rem; text-align: right; border: 1px solid #ddd;">TOTAL:</td>
+                <td style="padding: 1rem 0.75rem; text-align: right; border: 1px solid #ddd;">Rp {{ invoice.total_cost|floatformat:0 }}</td>
+            </tr>
+            
+            {% if invoice.paid_amount %}
+            <tr>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Dibayar ({{ invoice.get_payment_method_display }})</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp {{ invoice.paid_amount|floatformat:0 }}</td>
             </tr>
             <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">Oli Mesin</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">1</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 35.000</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 35.000</td>
+                <td style="padding: 0.75rem; border: 1px solid #ddd;">Kembalian</td>
+                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp {{ invoice.change_amount|floatformat:0 }}</td>
             </tr>
-            <tr style="background: #f4f4f4; font-weight: bold;">
-                <td colspan="3" style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Total:</td>
-                <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Rp 85.000</td>
-            </tr>
+            {% endif %}
         </tbody>
     </table>
+    
+    {% if invoice.notes %}
+    <div style="margin-top: 1rem; padding: 0.75rem; background: #f9f9f9; border-left: 3px solid #ff9800;">
+        <strong>Catatan:</strong><br>
+        {{ invoice.notes }}
+    </div>
+    {% endif %}
+    
+    <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+        <strong>Kasir:</strong> {{ invoice.cashier.get_full_name }}<br>
+        <strong>Tanggal Invoice:</strong> {{ invoice.created_at|date:"d F Y H:i" }}
+    </p>
 </div>
+{% else %}
+<div class="card">
+    <h3>Estimasi Biaya</h3>
+    <p><strong>Biaya Dasar Layanan:</strong> Rp {{ booking.service_type.base_price|floatformat:0 }}</p>
+    <p style="color: #666; font-size: 0.9rem;"><em>* Biaya final akan ditentukan setelah pemeriksaan selesai</em></p>
+</div>
+{% endif %}
 
 <div class="card">
     <a href="{% url 'customer:service_history' %}" class="btn btn-secondary">Kembali</a>
-    <button class="btn" onclick="window.print()">Print Invoice</button>
+    {% if invoice and booking.status == 'paid' %}
+    <button class="btn" onclick="window.print()">🖨️ Print Invoice</button>
+    {% elif invoice %}
+    <button class="btn" disabled style="opacity: 0.5; cursor: not-allowed;" title="Invoice hanya bisa dicetak setelah pembayaran selesai">🖨️ Print Invoice (Belum Dibayar)</button>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #{{ invoice.invoice_number }} - MotoFix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #ff9800;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #ff9800;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .invoice-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .invoice-info div {
+            flex: 1;
+        }
+        
+        .invoice-info h3 {
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ff9800;
+            padding-bottom: 5px;
+        }
+        
+        .invoice-info p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .invoice-info strong {
+            color: #666;
+            display: inline-block;
+            width: 120px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table thead {
+            background: #ff9800;
+            color: white;
+        }
+        
+        table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table tbody tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .subtotal-row {
+            background: #f5f5f5;
+            font-weight: 500;
+        }
+        
+        .total-row {
+            background: #ff9800;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .payment-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .payment-info p {
+            margin: 8px 0;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        .print-button {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: #ff9800;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #e68900;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            margin-left: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .invoice-container {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            .print-button {
+                display: none;
+            }
+            
+            table tbody tr:hover {
+                background: transparent;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏍️ MOTOFIX</h1>
+            <p>Bengkel Motor Profesional</p>
+        </div>
+        
+        <!-- Invoice Info -->
+        <div class="invoice-info">
+            <div>
+                <h3>Invoice</h3>
+                <p><strong>No Invoice:</strong> {{ invoice.invoice_number }}</p>
+                <p><strong>Tanggal:</strong> {{ invoice.created_at|date:"d F Y" }}</p>
+                <p><strong>Kasir:</strong> {{ invoice.cashier.get_full_name }}</p>
+            </div>
+            <div>
+                <h3>Pelanggan</h3>
+                <p><strong>Nama:</strong> {{ booking.customer.get_full_name }}</p>
+                <p><strong>Telepon:</strong> {{ booking.customer.phone|default:"-" }}</p>
+                <p><strong>Email:</strong> {{ booking.customer.email|default:"-" }}</p>
+            </div>
+        </div>
+        
+        <!-- Service Info -->
+        <div class="invoice-info">
+            <div>
+                <h3>Detail Servis</h3>
+                <p><strong>Booking:</strong> {{ booking.booking_number }}</p>
+                <p><strong>Motor:</strong> {{ booking.motor.brand }} {{ booking.motor.model }}</p>
+                <p><strong>Plat Nomor:</strong> {{ booking.motor.license_plate }}</p>
+                <p><strong>Mekanik:</strong> {{ booking.mechanic.get_full_name|default:"Belum ditugaskan" }}</p>
+            </div>
+            <div>
+                <h3>Periode Servis</h3>
+                <p><strong>Booking:</strong> {{ booking.booking_date|date:"d/m/Y H:i" }}</p>
+                {% if booking.start_date %}
+                <p><strong>Mulai:</strong> {{ booking.start_date|date:"d/m/Y H:i" }}</p>
+                {% endif %}
+                {% if booking.finish_date %}
+                <p><strong>Selesai:</strong> {{ booking.finish_date|date:"d/m/Y H:i" }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Cost Details -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Deskripsi</th>
+                    <th style="width: 100px;" class="text-right">Qty</th>
+                    <th style="width: 150px;" class="text-right">Harga</th>
+                    <th style="width: 150px;" class="text-right">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Jasa Servis -->
+                <tr>
+                    <td><strong>{{ booking.service_type.name }}</strong></td>
+                    <td class="text-right">1</td>
+                    <td class="text-right">Rp {{ invoice.service_cost|floatformat:0 }}</td>
+                    <td class="text-right">Rp {{ invoice.service_cost|floatformat:0 }}</td>
+                </tr>
+                
+                <!-- Suku Cadang -->
+                {% if spare_parts %}
+                <tr style="background: #f5f5f5;">
+                    <td colspan="4"><strong>Suku Cadang:</strong></td>
+                </tr>
+                {% for part in spare_parts %}
+                <tr>
+                    <td style="padding-left: 30px;">{{ part.name }}</td>
+                    <td class="text-right">{{ part.quantity }}</td>
+                    <td class="text-right">Rp {{ part.price|floatformat:0 }}</td>
+                    <td class="text-right">Rp {{ part.total_price|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="subtotal-row">
+                    <td colspan="3" class="text-right"><strong>Subtotal Suku Cadang:</strong></td>
+                    <td class="text-right"><strong>Rp {{ invoice.spare_parts_cost|floatformat:0 }}</strong></td>
+                </tr>
+                {% endif %}
+                
+                <!-- Jasa Tambahan -->
+                {% if additional_services %}
+                <tr style="background: #f5f5f5;">
+                    <td colspan="4"><strong>Jasa Tambahan:</strong></td>
+                </tr>
+                {% for service in additional_services %}
+                <tr>
+                    <td style="padding-left: 30px;">
+                        {{ service.name }}
+                        {% if service.description %}<br><small style="color: #666;">{{ service.description }}</small>{% endif %}
+                    </td>
+                    <td class="text-right">1</td>
+                    <td class="text-right">Rp {{ service.price|floatformat:0 }}</td>
+                    <td class="text-right">Rp {{ service.price|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="subtotal-row">
+                    <td colspan="3" class="text-right"><strong>Subtotal Jasa Tambahan:</strong></td>
+                    <td class="text-right"><strong>Rp {{ invoice.additional_cost|floatformat:0 }}</strong></td>
+                </tr>
+                {% endif %}
+                
+                <!-- Total -->
+                <tr class="total-row">
+                    <td colspan="3" class="text-right"><strong>TOTAL PEMBAYARAN:</strong></td>
+                    <td class="text-right"><strong>Rp {{ invoice.total_cost|floatformat:0 }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- Payment Info -->
+        <div class="payment-info">
+            <p><strong>Metode Pembayaran:</strong> {{ invoice.get_payment_method_display }}</p>
+            <p><strong>Jumlah Dibayar:</strong> Rp {{ invoice.paid_amount|floatformat:0 }}</p>
+            <p><strong>Kembalian:</strong> Rp {{ invoice.change_amount|floatformat:0 }}</p>
+        </div>
+        
+        {% if invoice.notes %}
+        <div style="margin: 20px 0; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px;">
+            <strong>Catatan:</strong><br>
+            {{ invoice.notes }}
+        </div>
+        {% endif %}
+        
+        <!-- Print Button -->
+        <div class="print-button">
+            <button onclick="window.print()" class="btn">
+                🖨️ Cetak Invoice
+            </button>
+            <a href="{% url 'admin_hub:booking_detail' booking.pk %}" class="btn btn-secondary">
+                ← Kembali
+            </a>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Terima kasih atas kepercayaan Anda!</strong></p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">
+                Invoice ini sah dan diproses oleh sistem MotoFix<br>
+                Dicetak pada: {{ "now"|date:"d F Y H:i" }}
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Auto print on load (optional)
+        window.addEventListener('load', function() {
+            // Uncomment below to auto-print when page loads
+            // setTimeout(function() { window.print(); }, 500);
+        });
+    </script>
+</body>
+</html>
