@@ -15,8 +15,10 @@ Anggota :
     
     Github : [https://github.com/Revoluz/MotoFix-Web-Based-OOP-Service-Manager-](https://github.com/Revoluz/MotoFix-Web-Based-OOP-Service-Manager-) 
     <br>
+    File Dokumen :[Portoflio Pemrograman Berorientasi Objek pada Sistem Informasi Service Motor Berbasis Framework Django.pdf](Portoflio%20Pemrograman%20Berorientasi%20Objek%20pada%20Sistem%20Informasi%20Service%20Motor%20Berbasis%20Framework%20Django.pdf)
+    <br>
     Setup Guide : [README-SETUP.md](README-SETUP.md)
-    
+ 
     Tampilan Awal Aplikasi :
     
     ![](UAS%20Implementasi%20Pemrograman%20Berorientasi%20Objek%20pa/image15.png)
