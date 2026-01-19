@@ -9,13 +9,13 @@
 1. Identitas Proyek : <br>
     Judul Proyek : Implementasi Pemrograman Berorientasi Objek pada Sistem Informasi Service Motor Berbasis Framework Django
 Anggota :
-    1. Farhan (2400018009)
-    2. Ahmad Fadhil Fanani (2400018026)
-    3. Dimas Idha Wibowo (2400018049)
+    1. Farhan (2400018009) [@Farhanhanx](https://github.com/Farhanhanx)
+    2. Ahmad Fadhil Fanani (2400018026) [@Revoluz](https://github.com/Revoluz)
+    3. Dimas Idha Wibowo (2400018049) [@Dimaswibowo1](https://github.com/Dimaswibowo1)
     
     Github : [https://github.com/Revoluz/MotoFix-Web-Based-OOP-Service-Manager-](https://github.com/Revoluz/MotoFix-Web-Based-OOP-Service-Manager-) 
     <br>
-    File Dokumen :[Portoflio Pemrograman Berorientasi Objek pada Sistem Informasi Service Motor Berbasis Framework Django.pdf](Portoflio%20Pemrograman%20Berorientasi%20Objek%20pada%20Sistem%20Informasi%20Service%20Motor%20Berbasis%20Framework%20Django.pdf)
+    File Dokumen :[Portoflio Pemrograman Berorientasi Objek pada Sistem Informasi Service Motor Berbasis Framework Django.pdf](UAS%20Implementasi%20Pemrograman%20Berorientasi%20Objek%20pa/Portoflio%20Pemrograman%20Berorientasi%20Objek%20pada%20Sistem%20Informasi%20Service%20Motor%20Berbasis%20Framework%20Django.pdf)
     <br>
     Setup Guide : [README-SETUP.md](README-SETUP.md)
  
