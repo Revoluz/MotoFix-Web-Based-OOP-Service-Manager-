@@ -6,7 +6,8 @@
 
 </div>
 
-1. Identitas Proyek : 
+1. Identitas Proyek : <br>
+    Judul Proyek : Implementasi Pemrograman Berorientasi Objek pada Sistem Informasi Service Motor Berbasis Framework Django
 Anggota :
     1. Farhan (2400018009)
     2. Ahmad Fadhil Fanani (2400018026)
