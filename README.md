@@ -13,7 +13,8 @@ Anggota :
     2. Ahmad Fadhil Fanani (2400018026)
     3. Dimas Idha Wibowo (2400018049)
     
-    Github : [https://github.com/Revoluz/MotoFix-Web-Based-OOP-Service-Manager-](https://github.com/Revoluz/MotoFix-Web-Based-OOP-Service-Manager-)
+    Github : [https://github.com/Revoluz/MotoFix-Web-Based-OOP-Service-Manager-](https://github.com/Revoluz/MotoFix-Web-Based-OOP-Service-Manager-) 
+    <br>
     Setup Guide : [README-SETUP.md](README-SETUP.md)
     
     Tampilan Awal Aplikasi :
