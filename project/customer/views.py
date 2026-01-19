@@ -105,7 +105,8 @@ def motor_edit(request, pk):
             
             # Validation
             if not all([license_plate, brand, model, year]):
-                messages.error(request, 'Plat nomor, merk, model, tahun, dan warna harus diisi!')
+                messages.error(request, 'Plat nomor,  model, dan tahun harus diisi!')
+                print(license_plate, brand, model, year)
                 return render(request, 'customer/motor_edit.html', {'motor': motor})
             
             # Check if license plate already exists (except current motor)
