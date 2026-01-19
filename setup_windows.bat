@@ -109,9 +109,18 @@ if not exist manage.py (
         echo [OK] Migrations completed successfully
     )
     echo.
+    
+    echo [STEP 7/7] Creating demo users...
+    python manage.py seed_users
+    if errorlevel 1 (
+        echo [WARNING] Failed to create demo users, but continuing...
+    ) else (
+        echo [OK] Demo users created successfully
+    )
+    echo.
 )
 
-echo [STEP 7/7] Setup complete!
+echo Setup complete!
 echo.
 echo ================================================
 echo Setup completed successfully!
@@ -120,9 +129,15 @@ echo.
 echo Next steps:
 echo 1. Review and update the .env file with your settings
 if exist manage.py (
-    echo 2. Create a superuser: python manage.py createsuperuser
-    echo 3. Run the development server: python manage.py runserver
-    echo 4. Visit http://127.0.0.1:8000/ in your browser
+    echo 2. Run the development server: python manage.py runserver
+    echo 3. Visit http://127.0.0.1:8000/ in your browser
+    echo 4. Login with demo credentials ^(see README.md^)
+    echo.
+    echo Demo credentials:
+    echo    Admin:    admin / admin123
+    echo    Kasir:    kasir / kasir123
+    echo    Mekanik:  mekanik / mekanik123
+    echo    Customer: customer / customer123
 ) else (
     echo 2. Initialize Django project: django-admin startproject motofix .
     echo 3. Create a superuser: python manage.py createsuperuser

@@ -70,6 +70,10 @@
                                     <a href="{% url 'admin_hub:service_edit' service.pk %}" class="btn btn-sm btn-warning" style="padding: 0.45rem 0.75rem; font-size: 0.85rem; font-weight: 500;">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
+                                    <button type="button" class="btn btn-sm btn-danger" style="padding: 0.45rem 0.75rem; font-size: 0.85rem; font-weight: 500; background-color: #dc3545;" 
+                                            onclick="confirmDelete({{ service.pk }}, '{{ service.name }}')">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -91,4 +95,19 @@
         </div>
     </div>
 </div>
+
+<!-- Hidden form for delete -->
+<form id="deleteForm" method="post" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<script>
+function confirmDelete(serviceId, serviceName) {
+    if (confirm('Apakah Anda yakin ingin menghapus layanan "' + serviceName + '"?\n\nPeringatan: Layanan yang sudah digunakan dalam booking tidak dapat dihapus.')) {
+        const form = document.getElementById('deleteForm');
+        form.action = '/admin-hub/services/' + serviceId + '/delete/';
+        form.submit();
+    }
+}
+</script>
 {% endblock %}

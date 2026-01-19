@@ -137,6 +137,30 @@ def service_edit(request, pk):
     })
 
 @admin_required
+def service_delete(request, pk):
+    """Hapus jenis layanan"""
+    from customer.models import ServiceType
+    service = get_object_or_404(ServiceType, pk=pk)
+    
+    if request.method == 'POST':
+        try:
+            # Cek apakah layanan sudah digunakan dalam booking
+            if ServiceBooking.objects.filter(service_type=service).exists():
+                messages.error(request, 
+                    f'Layanan "{service.name}" tidak dapat dihapus karena sudah digunakan dalam booking!')
+                return redirect('admin_hub:service_list')
+            
+            service_name = service.name
+            service.delete()
+            messages.success(request, f'Layanan "{service_name}" berhasil dihapus!')
+        except Exception as e:
+            messages.error(request, f'Gagal menghapus layanan: {str(e)}')
+        
+        return redirect('admin_hub:service_list')
+    
+    return redirect('admin_hub:service_list')
+
+@admin_required
 def mechanic_list(request):
     """List data mekanik"""
     mechanics = User.objects.filter(role='mechanic')
@@ -322,6 +346,7 @@ def booking_list(request):
         'assigned_count': ServiceBooking.objects.filter(status='assigned').count(),
         'in_progress_count': ServiceBooking.objects.filter(status='in_progress').count(),
         'finished_count': ServiceBooking.objects.filter(status='finished').count(),
+        'paid_count': ServiceBooking.objects.filter(status='paid').count(),
     }
     
     return render(request, 'admin_hub/booking_list.html', context)
@@ -500,6 +525,7 @@ def create_invoice(request, pk):
     
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method', 'cash')
+        paid_amount_str = request.POST.get('paid_amount', '0')
         
         try:
             # Hitung biaya layanan dasar
@@ -516,6 +542,17 @@ def create_invoice(request, pk):
             # Total biaya
             total_cost = service_cost + spare_parts_cost + additional_cost
             
+            # Parse paid amount dari form
+            paid_amount = Decimal(str(paid_amount_str))
+            
+            # Validasi pembayaran
+            if paid_amount < total_cost:
+                messages.error(request, f'Uang yang dibayarkan kurang! Total: Rp {total_cost:,.0f}, Dibayar: Rp {paid_amount:,.0f}')
+                return redirect('admin_hub:booking_detail', pk=pk)
+            
+            # Hitung kembalian
+            change_amount = paid_amount - total_cost
+            
             # Buat invoice
             invoice = Invoice.objects.create(
                 service_booking=booking,
@@ -525,8 +562,8 @@ def create_invoice(request, pk):
                 additional_cost=additional_cost,
                 total_cost=total_cost,
                 payment_method=payment_method,
-                paid_amount=total_cost,
-                change_amount=Decimal('0'),
+                paid_amount=paid_amount,
+                change_amount=change_amount,
                 cashier=request.user
             )
             
@@ -535,7 +572,9 @@ def create_invoice(request, pk):
                 booking.status = 'paid'
                 booking.save()
             
-            messages.success(request, f'Invoice {invoice.invoice_number} berhasil dibuat! Total: Rp {total_cost:,.0f}')
+            messages.success(request, 
+                f'Invoice {invoice.invoice_number} berhasil dibuat! '
+                f'Total: Rp {total_cost:,.0f} | Dibayar: Rp {paid_amount:,.0f} | Kembalian: Rp {change_amount:,.0f}')
             return redirect('admin_hub:booking_detail', pk=pk)
             
         except Exception as e:

@@ -181,7 +181,7 @@
                             <div class="alert alert-info mb-2" style="font-size: 0.875rem;">
                                 <i class="fas fa-info-circle"></i> Invoice belum dibuat
                             </div>
-                            <form method="post" action="{% url 'admin_hub:create_invoice' booking.pk %}">
+                            <form method="post" action="{% url 'admin_hub:create_invoice' booking.pk %}" id="invoiceForm">
                                 {% csrf_token %}
                                 <div class="mb-2">
                                     <label class="form-label" style="font-size: 0.875rem;">Metode Pembayaran</label>
@@ -193,8 +193,26 @@
                                         <option value="ewallet">E-Wallet</option>
                                     </select>
                                 </div>
+                                <div class="mb-2">
+                                    <label class="form-label" style="font-size: 0.875rem;">Total Tagihan</label>
+                                    <input type="text" class="form-control form-control-sm" id="totalCost" 
+                                           value="Rp {{ booking.service_type.base_price|floatformat:0 }}" readonly 
+                                           style="background-color: #e9ecef; font-weight: bold;">
+                                    <small class="text-muted">*Belum termasuk suku cadang & jasa tambahan</small>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" style="font-size: 0.875rem;">Jumlah Uang Dibayar <span class="text-danger">*</span></label>
+                                    <input type="number" name="paid_amount" class="form-control form-control-sm" 
+                                           placeholder="Masukkan jumlah uang" min="0" step="1000" required 
+                                           oninput="calculateChange()">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" style="font-size: 0.875rem;">Kembalian</label>
+                                    <input type="text" id="changeAmount" class="form-control form-control-sm" 
+                                           value="Rp 0" readonly style="background-color: #e9ecef; color: #28a745; font-weight: bold;">
+                                </div>
                                 <button type="submit" class="btn btn-primary btn-sm w-100 mb-2">
-                                    <i class="fas fa-file-invoice-dollar"></i> Buat Invoice
+                                    <i class="fas fa-file-invoice-dollar"></i> Buat Invoice & Proses Pembayaran
                                 </button>
                             </form>
                         {% else %}
@@ -254,6 +272,23 @@
 </div>
 
 <script>
+function calculateChange() {
+    // This is basic calculation, actual total will be calculated server-side
+    const totalCostText = document.getElementById('totalCost').value;
+    const totalCost = parseFloat(totalCostText.replace(/[^0-9]/g, ''));
+    const paidAmount = parseFloat(document.querySelector('input[name="paid_amount"]').value) || 0;
+    const change = paidAmount - totalCost;
+    
+    const changeInput = document.getElementById('changeAmount');
+    if (change >= 0) {
+        changeInput.value = 'Rp ' + change.toLocaleString('id-ID');
+        changeInput.style.color = '#28a745';
+    } else {
+        changeInput.value = 'Kurang: Rp ' + Math.abs(change).toLocaleString('id-ID');
+        changeInput.style.color = '#dc3545';
+    }
+}
+
 function printInvoice(bookingId) {
     // Buka halaman invoice di tab baru
     const invoiceUrl = `/admin-hub/invoice/${bookingId}/`;

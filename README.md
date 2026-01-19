@@ -25,11 +25,30 @@ For detailed setup instructions, please refer to [SETUP.md](SETUP.md).
 
 ## Features
 
-- 🎫 Ticketing system for motorcycle service requests
-- 💰 Invoice generation and management
-- 🏗️ Object-oriented architecture
-- 👥 User management and authentication
-- 📊 Service history tracking
+- Ticketing system for motorcycle service requests
+- Invoice generation and management
+- Object-oriented architecture
+- User management and authentication with role-based access
+- Service history tracking
+- Automated payment calculation with change
+- Invoice printing system
+
+## Demo Users
+
+After setup, run the seed command to create demo users:
+
+```bash
+python manage.py seed_users
+```
+
+This will create the following demo accounts:
+
+| Role     | Username | Password    | Description           |
+|----------|----------|-------------|-----------------------|
+| Admin    | admin    | admin123    | Full system access    |
+| Kasir    | kasir    | kasir123    | Cashier access        |
+| Mekanik  | mekanik  | mekanik123  | Mechanic access       |
+| Customer | customer | customer123 | Customer portal       |
 
 ## Documentation
 
@@ -53,15 +72,28 @@ After setup, use these commands:
 # Windows: venv\Scripts\activate
 # Linux: source venv/bin/activate
 
+# Run migrations
+python manage.py migrate
+
+# Create demo users (recommended for testing)
+python manage.py seed_users
+
 # Run development server
 python manage.py runserver
 
-# Create superuser
+# Create superuser (optional, if you need custom admin)
 python manage.py createsuperuser
-
-# Run migrations
-python manage.py migrate
 ```
+
+## First Time Setup
+
+1. Run automated setup script (setup_windows.bat or setup_ubuntu.sh)
+2. Activate virtual environment
+3. Run migrations: `python manage.py migrate`
+4. Create demo users: `python manage.py seed_users`
+5. Start server: `python manage.py runserver`
+6. Access at http://127.0.0.1:8000
+7. Login with demo credentials (see Demo Users section above)
 
 ## Contributing
 
